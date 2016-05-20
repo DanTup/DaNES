@@ -134,7 +134,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 
 					return string.Format(
 						"{0}{1}{2}{3}",
-						ProgramCounter.ToString("X2").PadRight(6),
+						ProgramCounter.ToString("X4").PadRight(6),
 						string.Join(" ", BytesRead.Select(b => b.ToString("X2"))).PadRight(10),
 						"".PadRight(32), // TODO: Don't bother with this for now, it's kinda complicated :)
 						Registers
