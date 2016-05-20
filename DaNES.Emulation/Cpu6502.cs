@@ -302,7 +302,7 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.ORA_IMD,    () => ORA(Immediate())    },
 				{ OpCode.ORA_ZERO,   () => ORA(ZeroPage())     },
 				{ OpCode.ORA_ZERO_X, () => ORA(ZeroPageX())    },
-				{ OpCode.ORA_ABS,    () => ORA(ZeroPageY())    },
+				{ OpCode.ORA_ABS,    () => ORA(Absolute())    },
 				{ OpCode.ORA_ABS_X,  () => ORA(AbsoluteX())    },
 				{ OpCode.ORA_ABS_Y,  () => ORA(AbsoluteY())    },
 				{ OpCode.ORA_IND_X,  () => ORA(IndirectX())    },
