@@ -84,6 +84,14 @@ namespace DanTup.DaNES.Emulation
 			PLA = 0x68,
 			PHP = 0x08,
 			PLP = 0x28,
+			AND_IMD = 0x29,
+			AND_ZERO = 0x25,
+			AND_ZERO_X = 0x35,
+			AND_ABS = 0x2D,
+			AND_ABS_X = 0x3D,
+			AND_ABS_Y = 0x39,
+			AND_IND_X = 0x21,
+			AND_IND_Y = 0x31,
 		}
 
 		/// <summary>
@@ -145,6 +153,14 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.PLA,  () => PLA()  },
 				{ OpCode.PHP,  () => PHP()  },
 				{ OpCode.PLP,  () => PLP()  },
+				{ OpCode.AND_IMD,  () => AND(Immediate())  },
+				{ OpCode.AND_ZERO,  () => AND(ZeroPage())  },
+				{ OpCode.AND_ZERO_X,  () => AND(ZeroPageX())  },
+				{ OpCode.AND_ABS,  () => AND(ZeroPageY())  },
+				{ OpCode.AND_ABS_X,  () => AND(AbsoluteX())  },
+				{ OpCode.AND_ABS_Y,  () => AND(AbsoluteY())  },
+				{ OpCode.AND_IND_X,  () => AND(IndirectX())  },
+				{ OpCode.AND_IND_Y,  () => AND(IndirectY())  },
 			};
 		}
 
@@ -190,7 +206,9 @@ namespace DanTup.DaNES.Emulation
 		void NOP() { }
 
 		void LDA(byte value) => Accumulator = SetZN(value);
+		void LDA(ushort address) => Accumulator = SetZN(Ram.Read(address));
 		void LDX(byte value) => XRegister = SetZN(value);
+		void LDX(ushort address) => XRegister = SetZN(Ram.Read(address));
 
 		void STA(ushort address) => Ram.Write(address, Accumulator);
 		void STX(ushort address) => Ram.Write(address, XRegister);
@@ -244,15 +262,21 @@ namespace DanTup.DaNES.Emulation
 			var loc = ReadNext(); // Always need to consume the next byte.
 			if (condition)
 				ProgramCounter += loc;
+
+			byte b = byte.MinValue;
+			var a = b & b;
 		}
+
+		void AND(byte value) => Accumulator = SetZN((byte)(Accumulator & value));
+		void AND(ushort address) => Accumulator = SetZN((byte)(Accumulator & Ram.Read(address)));
 
 		byte Immediate() => ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
-		ushort AbsoluteX() => (ushort)(Absolute() + XRegister);
-		ushort AbsoluteY() => (ushort)(Absolute() + YRegister);
-		byte ZeroPage() => Ram.Read(ReadNext());
-		byte ZeroPageX() => Ram.Read((ReadNext() + XRegister) % 256);
-		byte ZeroPageY() => Ram.Read((ReadNext() + YRegister) % 256);
+		ushort AbsoluteX() => (ushort)(FromBytes(ReadNext(), ReadNext()) + XRegister);
+		ushort AbsoluteY() => (ushort)(FromBytes(ReadNext(), ReadNext()) + YRegister);
+		ushort ZeroPage() => ReadNext();
+		ushort ZeroPageX() => (ushort)((ReadNext() + XRegister) % 256);
+		ushort ZeroPageY() => (ushort)((ReadNext() + YRegister) % 256);
 		ushort IndirectX() => Ram.Read(AbsoluteX());
 		ushort IndirectY() => Ram.Read(AbsoluteY());
 
