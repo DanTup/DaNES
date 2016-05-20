@@ -24,7 +24,7 @@ namespace DanTup.DaNES.Emulation
 		public bool Overflow { get; internal set; }
 		public bool Interrupted { get; internal set; }
 		public bool DecimalMode { get; internal set; }
-		public bool InterruptsEnabled { get; internal set; }
+		public bool InterruptsDisabled { get; internal set; } = true;
 		public bool ZeroResult { get; internal set; }
 		public bool Carry { get; internal set; }
 
@@ -78,6 +78,12 @@ namespace DanTup.DaNES.Emulation
 			BEQ = 0xF0,
 			BIT_ZERO = 0x24,
 			BIT_ABS = 0x2C,
+			TXS = 0x9A,
+			TSX = 0xBA,
+			PHA = 0x48,
+			PLA = 0x68,
+			PHP = 0x08,
+			PLP = 0x28,
 		}
 
 		/// <summary>
@@ -133,6 +139,12 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.STA_IND_Y,  () => STA(IndirectY())  },
 				{ OpCode.BIT_ZERO,  () => BIT(ZeroPage())  },
 				{ OpCode.BIT_ABS,  () => BIT(Absolute())  },
+				{ OpCode.TXS,  () => TXS()  },
+				{ OpCode.TSX,  () => TSX()  },
+				{ OpCode.PHA,  () => PHA()  },
+				{ OpCode.PLA,  () => PLA()  },
+				{ OpCode.PHP,  () => PHP()  },
+				{ OpCode.PLP,  () => PLP()  },
 			};
 		}
 
@@ -196,8 +208,8 @@ namespace DanTup.DaNES.Emulation
 
 		void CLC() => Carry = false;
 		void SEC() => Carry = true;
-		void CLI() => InterruptsEnabled = false;
-		void SEI() => InterruptsEnabled = true;
+		void CLI() => InterruptsDisabled = false;
+		void SEI() => InterruptsDisabled = true;
 		void CLV() => Overflow = false;
 		void CLD() => DecimalMode = false;
 		void SED() => DecimalMode = true;
@@ -209,6 +221,13 @@ namespace DanTup.DaNES.Emulation
 			Negative = (value & 128) != 0;
 			Overflow = (value & 64) != 0;
 		}
+
+		void TXS() => StackPointer = XRegister;
+		void TSX() => XRegister = SetZN((byte)StackPointer);
+		void PHA() => Push(Accumulator);
+		void PLA() => Accumulator = Pop();
+		void PHP() => Push(GetStatus());
+		void PLP() => SetStatus(Pop());
 
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
@@ -244,6 +263,32 @@ namespace DanTup.DaNES.Emulation
 			ZeroResult = value == 0;
 			Negative = (value & 128) != 0;
 			return value;
+		}
+
+		byte GetStatus()
+		{
+			return (byte)(
+				(Negative ? 128 : 0)
+				+ (Overflow ? 6 : 0)
+				+ (Interrupted ? 16 : 0)
+				+ (DecimalMode ? 8 : 0)
+				+ (InterruptsDisabled ? 4 : 0)
+				+ (ZeroResult ? 2 : 0)
+				+ (Carry ? 1 : 0)
+			);
+		}
+
+		void SetStatus(byte value)
+		{
+			// TODO: Decide if it's faster doing this and using bools elsewhere, or just having a byte for Status
+			// and doing the required bit operations elsewhere.
+			Negative = (value & 128) != 0;
+			Overflow = (value & 64) != 0;
+			Interrupted = (value & 16) != 0;
+			DecimalMode = (value & 8) != 0;
+			InterruptsDisabled = (value & 4) != 0;
+			ZeroResult = (value & 2) != 0;
+			Carry = (value & 1) != 0;
 		}
 
 		byte[] ToBytes(ushort value) => new[] { (byte)(value >> 8), (byte)value };

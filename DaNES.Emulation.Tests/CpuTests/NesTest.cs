@@ -146,7 +146,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			{
 				logInfo = new LogInfo();
 				logInfo.ProgramCounter = ProgramCounter;
-				var status = Convert.ToInt32(string.Format("{0}{1}1{2}{3}{4}{5}{6}", Negative ? 1 : 0, Overflow ? 1 : 0, Interrupted ? 1 : 0, DecimalMode ? 1 : 0, InterruptsEnabled ? 0 : 1, ZeroResult ? 1 : 0, Carry ? 1 : 0), 2);
+				var status = Convert.ToInt32(string.Format("{0}{1}1{2}{3}{4}{5}{6}", Negative ? 1 : 0, Overflow ? 1 : 0, Interrupted ? 1 : 0, DecimalMode ? 1 : 0, InterruptsDisabled ? 1 : 0, ZeroResult ? 1 : 0, Carry ? 1 : 0), 2);
 				logInfo.Registers = string.Format("A:{0:X2} X:{1:X2} Y:{2:X2} P:{3:X2} SP:{4:X2} CYC:{5:X2} SL:{6}", Accumulator, XRegister, YRegister, status, StackPointer, "0".PadLeft(3), "0".PadRight(3));
 
 				try
