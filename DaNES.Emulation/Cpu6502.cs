@@ -398,9 +398,9 @@ namespace DanTup.DaNES.Emulation
 			for (var i = 0; i < value.Length; i++)
 				Push(value[i]);
 		}
-		void Push(byte value) => Ram.Write(StackPointer--, value);
+		void Push(byte value) => Ram.Write(0x100 + StackPointer--, value);
 
-		byte Pop() => Ram.Read(++StackPointer);
+		byte Pop() => Ram.Read(0x100 + ++StackPointer);
 
 		void Branch(bool condition)
 		{
