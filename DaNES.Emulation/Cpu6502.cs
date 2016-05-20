@@ -170,6 +170,11 @@ namespace DanTup.DaNES.Emulation
 			ASL_ZERO_X = 0x16,
 			ASL_ABS = 0x0E,
 			ASL_ABS_X = 0x1E,
+			ROR_A = 0x6A,
+			ROR_ZERO = 0x66,
+			ROR_ZERO_X = 0x76,
+			ROR_ABS = 0x6E,
+			ROR_ABS_X = 0x7E,
 		}
 
 		/// <summary>
@@ -317,6 +322,11 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.ASL_ZERO_X, () => ASL(ZeroPageX())    },
 				{ OpCode.ASL_ABS,    () => ASL(Absolute())     },
 				{ OpCode.ASL_ABS_X,  () => ASL(AbsoluteX())    },
+				{ OpCode.ROR_A,      () => ROR_A()             },
+				{ OpCode.ROR_ZERO,   () => ROR(ZeroPage())     },
+				{ OpCode.ROR_ZERO_X, () => ROR(ZeroPageX())    },
+				{ OpCode.ROR_ABS,    () => ROR(Absolute())     },
+				{ OpCode.ROR_ABS_X,  () => ROR(AbsoluteX())    },
 			};
 		}
 
@@ -433,6 +443,15 @@ namespace DanTup.DaNES.Emulation
 		}
 		void ASL(ushort address) => Ram.Write(address, ASL(Ram.Read(address)));
 		void ASL_A() => Accumulator = ASL(Accumulator);
+
+		byte ROR(byte value)
+		{
+			var old_carry = Carry;
+			Carry = (value & 1) != 0;
+			return SetZN((byte)((value >> 1) | (old_carry ? 128 : 0)));
+		}
+		void ROR(ushort address) => Ram.Write(address, ROR(Ram.Read(address)));
+		void ROR_A() => Accumulator = ROR(Accumulator);
 
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
