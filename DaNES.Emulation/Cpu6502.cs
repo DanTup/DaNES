@@ -576,6 +576,13 @@ namespace DanTup.DaNES.Emulation
 		{
 			var addr1 = Absolute();
 			var addr2 = (ushort)(addr1 + 1);
+
+			// HARDWARE BUG!
+			// If the LSB wrapped from FF to 00 for the second byte
+			// it would remain on the same page!
+			// eg: 33FF 3300 would be read instead of 33FF 3400
+			addr2 = (ushort)((addr1 & 0xFF00) | (addr2 & 0x00FF));
+
 			return FromBytes(Ram.Read(addr1), Ram.Read(addr2));
 		}
 		ushort IndirectX()
