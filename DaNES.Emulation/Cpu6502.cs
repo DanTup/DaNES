@@ -108,6 +108,14 @@ namespace DanTup.DaNES.Emulation
 			ORA_ABS_Y = 0x19,
 			ORA_IND_X = 0x01,
 			ORA_IND_Y = 0x11,
+			EOR_IMD = 0x49,
+			EOR_ZERO = 0x45,
+			EOR_ZERO_X = 0x55,
+			EOR_ABS = 0x4D,
+			EOR_ABS_X = 0x5D,
+			EOR_ABS_Y = 0x59,
+			EOR_IND_X = 0x41,
+			EOR_IND_Y = 0x51,
 		}
 
 		/// <summary>
@@ -193,6 +201,14 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.ORA_ABS_Y,  () => ORA(AbsoluteY())    },
 				{ OpCode.ORA_IND_X,  () => ORA(IndirectX())    },
 				{ OpCode.ORA_IND_Y,  () => ORA(IndirectY())    },
+				{ OpCode.EOR_IMD,    () => EOR(Immediate())    },
+				{ OpCode.EOR_ZERO,   () => EOR(ZeroPage())     },
+				{ OpCode.EOR_ZERO_X, () => EOR(ZeroPageX())    },
+				{ OpCode.EOR_ABS,    () => EOR(ZeroPageY())    },
+				{ OpCode.EOR_ABS_X,  () => EOR(AbsoluteX())    },
+				{ OpCode.EOR_ABS_Y,  () => EOR(AbsoluteY())    },
+				{ OpCode.EOR_IND_X,  () => EOR(IndirectX())    },
+				{ OpCode.EOR_IND_Y,  () => EOR(IndirectY())    },
 			};
 		}
 
@@ -307,6 +323,9 @@ namespace DanTup.DaNES.Emulation
 
 		void ORA(byte value) => Accumulator = SetZN((byte)(Accumulator | value));
 		void ORA(ushort address) => ORA(Ram.Read(address));
+
+		void EOR(byte value) => Accumulator = SetZN((byte)(Accumulator ^ value));
+		void EOR(ushort address) => EOR(Ram.Read(address));
 
 		byte Immediate() => ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
