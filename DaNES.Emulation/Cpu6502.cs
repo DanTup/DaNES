@@ -183,6 +183,10 @@ namespace DanTup.DaNES.Emulation
 			ROL_ZERO_X = 0x36,
 			ROL_ABS = 0x2E,
 			ROL_ABS_X = 0x3E,
+			INC_ZERO = 0xE6,
+			INC_ZERO_X = 0xF6,
+			INC_ABS = 0xEE,
+			INC_ABS_X = 0xFE,
 		}
 
 		/// <summary>
@@ -343,6 +347,10 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.ROL_ZERO_X, () => ROL(ZeroPageX())    },
 				{ OpCode.ROL_ABS,    () => ROL(Absolute())     },
 				{ OpCode.ROL_ABS_X,  () => ROL(AbsoluteX())    },
+				{ OpCode.INC_ZERO,   () => INC(ZeroPage())      },
+				{ OpCode.INC_ZERO_X, () => INC(ZeroPageX())      },
+				{ OpCode.INC_ABS,    () => INC(Absolute())      },
+				{ OpCode.INC_ABS_X,  () => INC(AbsoluteX())      },
 			};
 		}
 
@@ -477,6 +485,8 @@ namespace DanTup.DaNES.Emulation
 		}
 		void ROL(ushort address) => Ram.Write(address, ROL(Ram.Read(address)));
 		void ROL_A() => Accumulator = ROL(Accumulator);
+
+		void INC(ushort address) => Ram.Write(address, SetZN((byte)(Ram.Read(address) + 1)));
 
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
