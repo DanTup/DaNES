@@ -24,7 +24,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			var actualLog = cpu.Log.ToString().Split('\n');
 			var expectedLog = File.ReadAllLines(ExpectedLogFile);
 
-			CompareResults(ex, actualLog, expectedLog);
+			CompareResults(actualLog, expectedLog, ex);
 
 			// Logs are in the following form:
 			//
@@ -48,11 +48,11 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 
 		// Everything below here is test plumbing for execution and comparison and not test code.
 
-		static void CompareResults(Exception ex, string[] actualLog, string[] expectedLog)
+		static void CompareResults(string[] actualLog, string[] expectedLog, Exception ex)
 		{
 			// Compare all executed insructions.
 			for (var i = 0; i < Math.Min(actualLog.Length, expectedLog.Length); i++)
-				CompareInstructionLog(actualLog, expectedLog, i);
+				CompareInstructionLog(actualLog, expectedLog, i, ex);
 
 			// Check log file was complete.
 			if (actualLog.Length < expectedLog.Length)
@@ -61,18 +61,18 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 					actualLog.Length,
 					expectedLog.Length,
 					expectedLog[actualLog.Length]
-				));
+				), ex);
 
 			// Check we didn't do too much.
 			if (actualLog.Length > expectedLog.Length)
-				throw new Exception("Actual log was longer than expected log. Actual log additionally contains:\r\n\t" + actualLog[expectedLog.Length]);
+				throw new Exception("Actual log was longer than expected log. Actual log additionally contains:\r\n\t" + actualLog[expectedLog.Length], ex);
 
 			// Check whether we failed for some other reason.
 			if (ex != null)
 				throw new Exception("Exception during execution", ex);
 		}
 
-		static void CompareInstructionLog(string[] actualLog, string[] expectedLog, int i)
+		static void CompareInstructionLog(string[] actualLog, string[] expectedLog, int i, Exception ex)
 		{
 			// We don't currently have the middle part of this log (it's really just a repeat of the first few bytes)
 			// so just strip it out.
@@ -82,7 +82,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 
 			// Compare this line of the log to the known-good NesTest output.
 			if (actual != expected)
-				throw new Exception(string.Format("Instruction not processed correctly at line {0}:\r\n\r\n{1} (expected)\r\n{2} (actual)\r\r{3} (previous)", i, expected, actual, i > 0 ? expectedLog[i - 1] : ""));
+				throw new Exception(string.Format("Instruction not processed correctly at line {0}:\r\n\r\n{1} (expected)\r\n{2} (actual)\r\r{3} (previous)", i, expected, actual, i > 0 ? expectedLog[i - 1] : ""), ex);
 		}
 
 		/// <summary>
