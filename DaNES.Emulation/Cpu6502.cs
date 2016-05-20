@@ -52,6 +52,13 @@ namespace DanTup.DaNES.Emulation
 			STX_ZERO_Y = 0x96,
 			JMP_ABS = 0x4C,
 			JSR = 0x20,
+			CLC = 0x18,
+			SEC = 0x38,
+			CLI = 0x58,
+			SEI = 0x78,
+			CLV = 0xB8,
+			CLD = 0xD8,
+			SED = 0xF8,
 		}
 
 		/// <summary>
@@ -81,6 +88,13 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.STX_ZERO_Y, () => STX(ZeroPageY()) },
 				{ OpCode.JMP_ABS,    () => JMP(Absolute())  },
 				{ OpCode.JSR,        () => JSR(Absolute())  },
+				{ OpCode.CLC,        () => CLC()            },
+				{ OpCode.SEC,        () => SEC()            },
+				{ OpCode.CLI,        () => CLI()            },
+				{ OpCode.SEI,        () => SEI()            },
+				{ OpCode.CLV,        () => CLV()            },
+				{ OpCode.CLD,        () => CLD()            },
+				{ OpCode.SED,        () => SED()            },
 			};
 		}
 
@@ -137,6 +151,14 @@ namespace DanTup.DaNES.Emulation
 			Push((ushort)(StackPointer - 1));
 			JMP(address);
 		}
+
+		void CLC() => Carry = false;
+		void SEC() => Carry = true;
+		void CLI() => InterruptsEnabled = false;
+		void SEI() => InterruptsEnabled = true;
+		void CLV() => Overflow = false;
+		void CLD() => DecimalMode = false;
+		void SED() => DecimalMode = true;
 
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
