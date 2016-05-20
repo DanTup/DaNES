@@ -60,6 +60,7 @@ namespace DanTup.DaNES.Emulation
 			STX_ZERO_Y = 0x96,
 			JMP_ABS = 0x4C,
 			JSR = 0x20,
+			RTS = 0x60,
 			CLC = 0x18,
 			SEC = 0x38,
 			CLI = 0x58,
@@ -107,6 +108,7 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.STX_ZERO_Y, () => STX(ZeroPageY())    },
 				{ OpCode.JMP_ABS,    () => JMP(Absolute())     },
 				{ OpCode.JSR,        () => JSR(Absolute())     },
+				{ OpCode.RTS,        () => RTS()               },
 				{ OpCode.CLC,        () => CLC()               },
 				{ OpCode.SEC,        () => SEC()               },
 				{ OpCode.CLI,        () => CLI()               },
@@ -190,6 +192,8 @@ namespace DanTup.DaNES.Emulation
 			JMP(address);
 		}
 
+		void RTS() => StackPointer = FromBytes(Pop(), Pop());
+
 		void CLC() => Carry = false;
 		void SEC() => Carry = true;
 		void CLI() => InterruptsEnabled = false;
@@ -212,6 +216,8 @@ namespace DanTup.DaNES.Emulation
 			Ram.Write(StackPointer - (value.Length - 1), value);
 			StackPointer -= (ushort)value.Length;
 		}
+
+		byte Pop() => Ram.Read(StackPointer--);
 
 		void Branch(bool condition)
 		{
