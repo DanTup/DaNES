@@ -160,6 +160,11 @@ namespace DanTup.DaNES.Emulation
 			SBC_ABS_Y = 0xF9,
 			SBC_IND_X = 0xE1,
 			SBC_IND_Y = 0xF1,
+			LSR_A = 0x4A,
+			LSR_ZERO = 0x46,
+			LSR_ZERO_X = 0x56,
+			LSR_ABS = 0x4E,
+			LSR_ABS_X = 0x5E,
 		}
 
 		/// <summary>
@@ -297,6 +302,11 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.SBC_ABS_Y,  () => SBC(AbsoluteY())    },
 				{ OpCode.SBC_IND_X,  () => SBC(IndirectX())    },
 				{ OpCode.SBC_IND_Y,  () => SBC(IndirectY())    },
+				{ OpCode.LSR_A,      () => LSR_A()             },
+				{ OpCode.LSR_ZERO,   () => LSR(ZeroPage())     },
+				{ OpCode.LSR_ZERO_X, () => LSR(ZeroPageX())    },
+				{ OpCode.LSR_ABS,    () => LSR(Absolute())     },
+				{ OpCode.LSR_ABS_X,  () => LSR(AbsoluteX())    },
 			};
 		}
 
@@ -398,6 +408,13 @@ namespace DanTup.DaNES.Emulation
 		void DEY() => SetZN(--YRegister);
 		void INY() => SetZN(++YRegister);
 
+		byte LSR(byte value)
+		{
+			Carry = (value & 1) != 0;
+			return SetZN((byte)(value >> 1));
+		}
+		void LSR(ushort address) => Ram.Write(address, LSR(Ram.Read(address)));
+		void LSR_A() => Accumulator = LSR(Accumulator);
 
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
