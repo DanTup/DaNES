@@ -334,7 +334,12 @@ namespace DanTup.DaNES.Emulation
 		void AND(byte value) => Accumulator = SetZN((byte)(Accumulator & value));
 		void AND(ushort address) => AND(Ram.Read(address));
 
-		void CMP(byte value) => Carry = (SetZN((byte)(Accumulator - value)) & 256) == 0;
+		void CMP(byte value)
+		{
+			var result = Accumulator - value;
+			Carry = (result & 256) == 0;
+			SetZN((byte)result);
+		}
 		void CMP(ushort address) => CMP(Ram.Read(address));
 
 		void ORA(byte value) => Accumulator = SetZN((byte)(Accumulator | value));
