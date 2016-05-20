@@ -46,6 +46,13 @@ namespace DanTup.DaNES.Emulation
 			LDA_IMD = 0xA9,
 			LDA_ZERO = 0xA5,
 			LDA_ZERO_X = 0xB5,
+			STA_ZERO = 0x85,
+			STA_ZERO_X = 0x95,
+			STA_ABS = 0x8D,
+			STA_ABS_X = 0x9D,
+			STA_ABS_Y = 0x99,
+			STA_IND_X = 0x81,
+			STA_IND_Y = 0x91,
 			LDX_IMD = 0xA2,
 			LDX_ZERO = 0xA6,
 			LDX_ZERO_Y = 0xB6,
@@ -113,6 +120,13 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.BCS,        () => Branch(Carry)       },
 				{ OpCode.BNE,        () => Branch(!ZeroResult) },
 				{ OpCode.BEQ,        () => Branch(ZeroResult)  },
+				{ OpCode.STA_ZERO,   () => STA(ZeroPage())  },
+				{ OpCode.STA_ZERO_X, () => STA(ZeroPageX())  },
+				{ OpCode.STA_ABS,    () => STA(Absolute())  },
+				{ OpCode.STA_ABS_X,  () => STA(AbsoluteX())  },
+				{ OpCode.STA_ABS_Y,  () => STA(AbsoluteY())  },
+				{ OpCode.STA_IND_X,  () => STA(IndirectX())  },
+				{ OpCode.STA_IND_Y,  () => STA(IndirectY())  },
 			};
 		}
 
@@ -196,9 +210,13 @@ namespace DanTup.DaNES.Emulation
 
 		byte Immediate() => this.ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
+		ushort AbsoluteX() => (ushort)(Absolute() + XRegister);
+		ushort AbsoluteY() => (ushort)(Absolute() + YRegister);
 		byte ZeroPage() => Ram.Read(ReadNext());
 		byte ZeroPageX() => Ram.Read(ReadNext() + XRegister);
 		byte ZeroPageY() => Ram.Read(ReadNext() + YRegister);
+		ushort IndirectX() => Ram.Read(AbsoluteX());
+		ushort IndirectY() => Ram.Read(AbsoluteY());
 
 		protected virtual byte ReadNext() => Ram.Read(ProgramCounter++);
 
