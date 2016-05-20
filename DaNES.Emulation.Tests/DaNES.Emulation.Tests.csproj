@@ -62,9 +62,13 @@
   <ItemGroup>
     <Compile Include="CpuTests\CpuTests.cs" />
     <Compile Include="CpuTests\LdaTests.cs" />
+    <Compile Include="CpuTests\NesTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Logs\nestest.actual.log" />
+    <None Include="Logs\nestest.expected.log" />
     <None Include="packages.config" />
+    <None Include="Roms\nestest.nes" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
