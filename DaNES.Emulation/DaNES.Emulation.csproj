@@ -40,7 +40,7 @@
   <ItemGroup>
     <Compile Include="Cpu.cs" />
     <Compile Include="Memory.cs" />
-    <Folder Include="Properties\" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
