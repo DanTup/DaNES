@@ -11,6 +11,8 @@ namespace DanTup.DaNES.Emulation
 			memory = new byte[size];
 		}
 
+		public int Length => memory.Length;
+
 		public byte Read(int address) => memory[address];
 
 		public void Write(int address, byte value) => memory[address] = value;
