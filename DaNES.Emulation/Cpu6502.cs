@@ -107,6 +107,12 @@ namespace DanTup.DaNES.Emulation
 			CMP_ABS_Y = 0xD9,
 			CMP_IND_X = 0xC1,
 			CMP_IND_Y = 0xD1,
+			CPX_IMD = 0xE0,
+			CPX_ZERO = 0xE4,
+			CPX_ABS = 0xEC,
+			CPY_IMD = 0xC0,
+			CPY_ZERO = 0xC4,
+			CPY_ABS = 0xCC,
 			ORA_IMD = 0x09,
 			ORA_ZERO = 0x05,
 			ORA_ZERO_X = 0x15,
@@ -215,6 +221,12 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.CMP_ABS_Y,  () => CMP(AbsoluteY())    },
 				{ OpCode.CMP_IND_X,  () => CMP(IndirectX())    },
 				{ OpCode.CMP_IND_Y,  () => CMP(IndirectY())    },
+				{ OpCode.CPX_IMD,    () => CPX(Immediate())    },
+				{ OpCode.CPX_ZERO,   () => CPX(ZeroPage())     },
+				{ OpCode.CPX_ABS,    () => CPX(Absolute())     },
+				{ OpCode.CPY_IMD,    () => CPY(Immediate())    },
+				{ OpCode.CPY_ZERO,   () => CPY(ZeroPage())     },
+				{ OpCode.CPY_ABS,    () => CPY(Absolute())     },
 				{ OpCode.ORA_IMD,    () => ORA(Immediate())    },
 				{ OpCode.ORA_ZERO,   () => ORA(ZeroPage())     },
 				{ OpCode.ORA_ZERO_X, () => ORA(ZeroPageX())    },
@@ -357,6 +369,22 @@ namespace DanTup.DaNES.Emulation
 			SetZN((byte)result);
 		}
 		void CMP(ushort address) => CMP(Ram.Read(address));
+
+		void CPX(byte value)
+		{
+			var result = XRegister - value;
+			Carry = (result & 256) == 0;
+			SetZN((byte)result);
+		}
+		void CPX(ushort address) => CPX(Ram.Read(address));
+
+		void CPY(byte value)
+		{
+			var result = YRegister - value;
+			Carry = (result & 256) == 0;
+			SetZN((byte)result);
+		}
+		void CPY(ushort address) => CPY(Ram.Read(address));
 
 		void ORA(byte value) => Accumulator = SetZN((byte)(Accumulator | value));
 		void ORA(ushort address) => ORA(Ram.Read(address));
