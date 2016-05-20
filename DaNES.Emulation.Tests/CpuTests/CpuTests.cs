@@ -6,7 +6,7 @@
 
 		protected void Run(params byte[] program)
 		{
-			cpu.LoadProgram(program);
+			cpu.LoadProgram(program, false);
 			cpu.Run();
 		}
 	}
