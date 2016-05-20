@@ -192,7 +192,7 @@ namespace DanTup.DaNES.Emulation
 			JMP(address);
 		}
 
-		void RTS() => StackPointer = FromBytes(Pop(), Pop());
+		void RTS() => ProgramCounter = FromBytes(Pop(), Pop());
 
 		void CLC() => Carry = false;
 		void SEC() => Carry = true;
@@ -217,7 +217,7 @@ namespace DanTup.DaNES.Emulation
 			StackPointer -= (ushort)value.Length;
 		}
 
-		byte Pop() => Ram.Read(StackPointer--);
+		byte Pop() => Ram.Read(++StackPointer);
 
 		void Branch(bool condition)
 		{
