@@ -188,11 +188,11 @@ namespace DanTup.DaNES.Emulation
 
 		void JSR(ushort address)
 		{
-			Push((ushort)(StackPointer - 1));
+			Push((ushort)(ProgramCounter - 1));
 			JMP(address);
 		}
 
-		void RTS() => ProgramCounter = FromBytes(Pop(), Pop());
+		void RTS() => ProgramCounter = (ushort)(FromBytes(Pop(), Pop()) + 1);
 
 		void CLC() => Carry = false;
 		void SEC() => Carry = true;
@@ -213,9 +213,10 @@ namespace DanTup.DaNES.Emulation
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
 		{
-			Ram.Write(StackPointer - (value.Length - 1), value);
-			StackPointer -= (ushort)value.Length;
+			for (var i = 0; i < value.Length; i++)
+				Push(value[i]);
 		}
+		void Push(byte value) => Ram.Write(StackPointer--, value);
 
 		byte Pop() => Ram.Read(++StackPointer);
 
