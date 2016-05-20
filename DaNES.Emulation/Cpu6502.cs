@@ -331,7 +331,8 @@ namespace DanTup.DaNES.Emulation
 		{
 			return (byte)(
 				(Negative ? 128 : 0)
-				+ (Overflow ? 6 : 0)
+				+ (Overflow ? 64 : 0)
+				+ 32
 				+ (Interrupted ? 16 : 0)
 				+ (DecimalMode ? 8 : 0)
 				+ (InterruptsDisabled ? 4 : 0)
