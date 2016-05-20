@@ -21,7 +21,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			// the incorrect opcode the failure.
 			var ex = TryRunNesTest();
 
-			var actualLog = ((LoggingCpu)nes.Cpu).Log.ToString().Split('\n');
+			var actualLog = ((LoggingCpu)nes.Cpu).Log.ToString().Trim().Split('\n');
 			var expectedLog = File.ReadAllLines(ExpectedLogFile);
 
 			CompareResults(actualLog, expectedLog, ex);

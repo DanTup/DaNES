@@ -51,6 +51,7 @@ namespace DanTup.DaNES.Emulation
 			STX_IMD = 0x86,
 			STX_ZERO_Y = 0x96,
 			JMP_ABS = 0x4C,
+			JSR = 0x20,
 		}
 
 		// TODO: Fill these in!
@@ -101,6 +102,7 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.STX_IMD,    () => STX(Immediate()) },
 				{ OpCode.STX_ZERO_Y, () => STX(ZeroPageY()) },
 				{ OpCode.JMP_ABS,    () => JMP(Absolute())  },
+				{ OpCode.JSR,        () => JSR(Absolute())  },
 			};
 		}
 
@@ -152,8 +154,21 @@ namespace DanTup.DaNES.Emulation
 
 		void JMP(ushort address) => ProgramCounter = address;
 
+		void JSR(ushort address)
+		{
+			Push((ushort)(StackPointer - 1));
+			JMP(address);
+		}
+
+		void Push(ushort value) => Push(ToBytes(value));
+		void Push(byte[] value)
+		{
+			Ram.Write(StackPointer - (value.Length - 1), value);
+			StackPointer -= (ushort)value.Length;
+		}
+
 		byte Immediate() => this.ReadNext();
-		ushort Absolute() => (ushort)(ReadNext() | ReadNext() << 8);
+		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
 		byte ZeroPage() => Ram.Read(ReadNext());
 		byte ZeroPageX() => Ram.Read(ReadNext() + XRegister);
 		byte ZeroPageY() => Ram.Read(ReadNext() + YRegister);
@@ -166,5 +181,8 @@ namespace DanTup.DaNES.Emulation
 			Negative = (value & 128) != 0;
 			return value;
 		}
+
+		byte[] ToBytes(ushort value) => new[] { (byte)(value >> 8), (byte)value };
+		ushort FromBytes(byte b1, byte b2) => (ushort)(b1 | b2 << 8);
 	}
 }
