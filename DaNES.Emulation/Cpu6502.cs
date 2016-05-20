@@ -91,6 +91,14 @@ namespace DanTup.DaNES.Emulation
 			PLA = 0x68,
 			PHP = 0x08,
 			PLP = 0x28,
+			TAX = 0xAA,
+			TXA = 0x8A,
+			DEX = 0xCA,
+			INX = 0xE8,
+			TAY = 0xA8,
+			TYA = 0x98,
+			DEY = 0x88,
+			INY = 0xC8,
 			AND_IMD = 0x29,
 			AND_ZERO = 0x25,
 			AND_ZERO_X = 0x35,
@@ -213,6 +221,14 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.PLA,        () => PLA()               },
 				{ OpCode.PHP,        () => PHP()               },
 				{ OpCode.PLP,        () => PLP()               },
+				{ OpCode.TAX,        () => TAX()               },
+				{ OpCode.TXA,        () => TXA()               },
+				{ OpCode.DEX,        () => DEX()               },
+				{ OpCode.INX,        () => INX()               },
+				{ OpCode.TAY,        () => TAY()               },
+				{ OpCode.TYA,        () => TYA()               },
+				{ OpCode.DEY,        () => DEY()               },
+				{ OpCode.INY,        () => INY()               },
 				{ OpCode.AND_IMD,    () => AND(Immediate())    },
 				{ OpCode.AND_ZERO,   () => AND(ZeroPage())     },
 				{ OpCode.AND_ZERO_X, () => AND(ZeroPageX())    },
@@ -354,6 +370,15 @@ namespace DanTup.DaNES.Emulation
 		void PLA() => Accumulator = SetZN(Pop());
 		void PHP() => Push((byte)(GetStatus() | 16));
 		void PLP() => SetStatus(Pop());
+		void TAX() => XRegister = SetZN(Accumulator);
+		void TXA() => Accumulator = SetZN(XRegister);
+		void DEX() => SetZN(--XRegister);
+		void INX() => SetZN(++XRegister);
+		void TAY() => YRegister = SetZN(Accumulator);
+		void TYA() => Accumulator = SetZN(YRegister);
+		void DEY() => SetZN(--YRegister);
+		void INY() => SetZN(++YRegister);
+
 
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
