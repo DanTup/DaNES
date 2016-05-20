@@ -74,6 +74,7 @@ namespace DanTup.DaNES.Emulation
 			JMP_ABS = 0x4C,
 			JSR = 0x20,
 			RTS = 0x60,
+			RTI = 0x40,
 			CLC = 0x18,
 			SEC = 0x38,
 			CLI = 0x58,
@@ -203,6 +204,7 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.JMP_ABS,    () => JMP(Absolute())     },
 				{ OpCode.JSR,        () => JSR(Absolute())     },
 				{ OpCode.RTS,        () => RTS()               },
+				{ OpCode.RTI,        () => RTI()               },
 				{ OpCode.CLC,        () => CLC()               },
 				{ OpCode.SEC,        () => SEC()               },
 				{ OpCode.CLI,        () => CLI()               },
@@ -359,6 +361,11 @@ namespace DanTup.DaNES.Emulation
 		}
 
 		void RTS() => ProgramCounter = (ushort)(FromBytes(Pop(), Pop()) + 1);
+		void RTI()
+		{
+			SetStatus(Pop());
+			ProgramCounter = FromBytes(Pop(), Pop());
+		}
 
 		void CLC() => Carry = false;
 		void SEC() => Carry = true;
