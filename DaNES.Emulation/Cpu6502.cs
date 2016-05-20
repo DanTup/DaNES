@@ -280,7 +280,7 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.AND_IMD,    () => AND(Immediate())    },
 				{ OpCode.AND_ZERO,   () => AND(ZeroPage())     },
 				{ OpCode.AND_ZERO_X, () => AND(ZeroPageX())    },
-				{ OpCode.AND_ABS,    () => AND(ZeroPageY())    },
+				{ OpCode.AND_ABS,    () => AND(Absolute())    },
 				{ OpCode.AND_ABS_X,  () => AND(AbsoluteX())    },
 				{ OpCode.AND_ABS_Y,  () => AND(AbsoluteY())    },
 				{ OpCode.AND_IND_X,  () => AND(IndirectX())    },
