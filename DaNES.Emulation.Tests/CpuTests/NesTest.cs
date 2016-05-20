@@ -76,9 +76,9 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		{
 			// We don't currently have the middle part of this log (it's really just a repeat of the first few bytes)
 			// so just strip it out.
-			// TODO: Uncomment to check the bits at the end!
-			var actual = actualLog[i].Substring(0, 16);// + actualLog[i].Substring(48);
-			var expected = expectedLog[i].Substring(0, 16);// + expectedLog[i].Substring(48);
+			// TODO: Don't chop the end off either....
+			var actual = actualLog[i].Substring(0, 16) + actualLog[i].Substring(48, 25);
+			var expected = expectedLog[i].Substring(0, 16) + expectedLog[i].Substring(48, 25);
 
 			// Compare this line of the log to the known-good NesTest output.
 			if (actual != expected)
