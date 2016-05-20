@@ -347,7 +347,7 @@ namespace DanTup.DaNES.Emulation
 			// and doing the required bit operations elsewhere.
 			Negative = (value & 128) != 0;
 			Overflow = (value & 64) != 0;
-			Interrupted = (value & 16) != 0;
+			Interrupted = false;
 			DecimalMode = (value & 8) != 0;
 			InterruptsDisabled = (value & 4) != 0;
 			ZeroResult = (value & 2) != 0;
