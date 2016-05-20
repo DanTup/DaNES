@@ -578,7 +578,9 @@ namespace DanTup.DaNES.Emulation
 		}
 		ushort IndirectY()
 		{
-			throw new Exception();
+			var addr1 = ZeroPage();
+			var addr2 = (ushort)(addr1 + 1);
+			return (ushort)(FromBytes(Ram.Read(addr1), Ram.Read((ushort)(addr2 % 256))) + YRegister);
 		}
 
 		protected virtual byte ReadNext() => Ram.Read(ProgramCounter++);
