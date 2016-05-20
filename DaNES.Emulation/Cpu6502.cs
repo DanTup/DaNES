@@ -92,6 +92,22 @@ namespace DanTup.DaNES.Emulation
 			AND_ABS_Y = 0x39,
 			AND_IND_X = 0x21,
 			AND_IND_Y = 0x31,
+			CMP_IMD = 0xC9,
+			CMP_ZERO = 0xC5,
+			CMP_ZERO_X = 0xD5,
+			CMP_ABS = 0xCD,
+			CMP_ABS_X = 0xDD,
+			CMP_ABS_Y = 0xD9,
+			CMP_IND_X = 0xC1,
+			CMP_IND_Y = 0xD1,
+			ORA_IMD = 0x09,
+			ORA_ZERO = 0x05,
+			ORA_ZERO_X = 0x15,
+			ORA_ABS = 0x0D,
+			ORA_ABS_X = 0x1D,
+			ORA_ABS_Y = 0x19,
+			ORA_IND_X = 0x01,
+			ORA_IND_Y = 0x11,
 		}
 
 		/// <summary>
@@ -161,6 +177,22 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.AND_ABS_Y,  () => AND(AbsoluteY())    },
 				{ OpCode.AND_IND_X,  () => AND(IndirectX())    },
 				{ OpCode.AND_IND_Y,  () => AND(IndirectY())    },
+				{ OpCode.CMP_IMD,    () => CMP(Immediate())    },
+				{ OpCode.CMP_ZERO,   () => CMP(ZeroPage())     },
+				{ OpCode.CMP_ZERO_X, () => CMP(ZeroPageX())    },
+				{ OpCode.CMP_ABS,    () => CMP(ZeroPageY())    },
+				{ OpCode.CMP_ABS_X,  () => CMP(AbsoluteX())    },
+				{ OpCode.CMP_ABS_Y,  () => CMP(AbsoluteY())    },
+				{ OpCode.CMP_IND_X,  () => CMP(IndirectX())    },
+				{ OpCode.CMP_IND_Y,  () => CMP(IndirectY())    },
+				{ OpCode.ORA_IMD,    () => ORA(Immediate())    },
+				{ OpCode.ORA_ZERO,   () => ORA(ZeroPage())     },
+				{ OpCode.ORA_ZERO_X, () => ORA(ZeroPageX())    },
+				{ OpCode.ORA_ABS,    () => ORA(ZeroPageY())    },
+				{ OpCode.ORA_ABS_X,  () => ORA(AbsoluteX())    },
+				{ OpCode.ORA_ABS_Y,  () => ORA(AbsoluteY())    },
+				{ OpCode.ORA_IND_X,  () => ORA(IndirectX())    },
+				{ OpCode.ORA_IND_Y,  () => ORA(IndirectY())    },
 			};
 		}
 
@@ -268,7 +300,13 @@ namespace DanTup.DaNES.Emulation
 		}
 
 		void AND(byte value) => Accumulator = SetZN((byte)(Accumulator & value));
-		void AND(ushort address) => Accumulator = SetZN((byte)(Accumulator & Ram.Read(address)));
+		void AND(ushort address) => AND(Ram.Read(address));
+
+		void CMP(byte value) => Carry = (SetZN((byte)(Accumulator - value)) & 256) == 0;
+		void CMP(ushort address) => CMP(Ram.Read(address));
+
+		void ORA(byte value) => Accumulator = SetZN((byte)(Accumulator | value));
+		void ORA(ushort address) => ORA(Ram.Read(address));
 
 		byte Immediate() => ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
