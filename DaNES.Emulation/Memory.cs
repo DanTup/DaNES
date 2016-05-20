@@ -13,10 +13,10 @@ namespace DanTup.DaNES.Emulation
 
 		public int Length => memory.Length;
 
-		public byte Read(int address) => memory[address];
+		public byte Read(ushort address) => memory[address];
 
-		public void Write(int address, byte value) => memory[address] = value;
+		public void Write(ushort address, byte value) => memory[address] = value;
 
-		public void Write(int address, byte[] value) => Array.Copy(value, 0, memory, address, value.Length);
+		public void Write(ushort address, byte[] value) => Array.Copy(value, 0, memory, address, value.Length);
 	}
 }

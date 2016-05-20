@@ -478,9 +478,9 @@ namespace DanTup.DaNES.Emulation
 			for (var i = 0; i < value.Length; i++)
 				Push(value[i]);
 		}
-		void Push(byte value) => Ram.Write(0x100 + StackPointer--, value);
+		void Push(byte value) => Ram.Write((ushort)(0x100 + StackPointer--), value);
 
-		byte Pop() => Ram.Read(0x100 + ++StackPointer);
+		byte Pop() => Ram.Read((ushort)(0x100 + ++StackPointer));
 
 		void Branch(bool condition)
 		{
@@ -545,8 +545,16 @@ namespace DanTup.DaNES.Emulation
 		ushort ZeroPage() => ReadNext();
 		ushort ZeroPageX() => (ushort)((ReadNext() + XRegister) % 256);
 		ushort ZeroPageY() => (ushort)((ReadNext() + YRegister) % 256);
-		ushort IndirectX() => Ram.Read(AbsoluteX());
-		ushort IndirectY() => Ram.Read(AbsoluteY());
+		ushort IndirectX()
+		{
+			var addr1 = ZeroPageX();
+			var addr2 = (ushort)(addr1 + 1);
+			return FromBytes(Ram.Read(addr1), Ram.Read((ushort)(addr2 % 256)));
+		}
+		ushort IndirectY()
+		{
+			throw new Exception();
+		}
 
 		protected virtual byte ReadNext() => Ram.Read(ProgramCounter++);
 
