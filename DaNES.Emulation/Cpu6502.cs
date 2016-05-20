@@ -75,6 +75,8 @@ namespace DanTup.DaNES.Emulation
 			BCS = 0xB0,
 			BNE = 0xD0,
 			BEQ = 0xF0,
+			BIT_ZERO = 0x24,
+			BIT_ABS = 0x2C,
 		}
 
 		/// <summary>
@@ -127,6 +129,8 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.STA_ABS_Y,  () => STA(AbsoluteY())  },
 				{ OpCode.STA_IND_X,  () => STA(IndirectX())  },
 				{ OpCode.STA_IND_Y,  () => STA(IndirectY())  },
+				{ OpCode.BIT_ZERO,  () => BIT(ZeroPage())  },
+				{ OpCode.BIT_ABS,  () => BIT(Absolute())  },
 			};
 		}
 
@@ -193,6 +197,14 @@ namespace DanTup.DaNES.Emulation
 		void CLV() => Overflow = false;
 		void CLD() => DecimalMode = false;
 		void SED() => DecimalMode = true;
+
+		void BIT(ushort address)
+		{
+			var value = Ram.Read(address);
+			ZeroResult = (value & Accumulator) == 0;
+			Negative = (value & 128) != 0;
+			Overflow = (value & 64) != 0;
+		}
 
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
