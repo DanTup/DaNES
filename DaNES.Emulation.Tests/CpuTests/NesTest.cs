@@ -44,7 +44,6 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			// SP: FD      The stack pointer
 			// CYC:  0     How many cycles have executed
 			// SL: 241     The current scan line
-
 		}
 
 		// Everything below here is test plumbing for execution and comparison and not test code.
@@ -77,6 +76,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		{
 			// We don't currently have the middle part of this log (it's really just a repeat of the first few bytes)
 			// so just strip it out.
+			// TODO: Uncomment to check the bits at the end!
 			var actual = actualLog[i].Substring(0, 16);// + actualLog[i].Substring(48);
 			var expected = expectedLog[i].Substring(0, 16);// + expectedLog[i].Substring(48);
 
