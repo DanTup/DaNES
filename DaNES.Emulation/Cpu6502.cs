@@ -275,8 +275,8 @@ namespace DanTup.DaNES.Emulation
 		void TXS() => StackPointer = XRegister;
 		void TSX() => XRegister = SetZN((byte)StackPointer);
 		void PHA() => Push(Accumulator);
-		void PLA() => Accumulator = Pop();
-		void PHP() => Push(GetStatus());
+		void PLA() => Accumulator = SetZN(Pop());
+		void PHP() => Push((byte)(GetStatus() | 16));
 		void PLP() => SetStatus(Pop());
 
 		void Push(ushort value) => Push(ToBytes(value));
