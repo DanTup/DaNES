@@ -137,6 +137,14 @@ namespace DanTup.DaNES.Emulation
 			ADC_ABS_Y = 0x79,
 			ADC_IND_X = 0x61,
 			ADC_IND_Y = 0x71,
+			SBC_IMD = 0xE9,
+			SBC_ZERO = 0xE5,
+			SBC_ZERO_X = 0xF5,
+			SBC_ABS = 0xED,
+			SBC_ABS_X = 0xFD,
+			SBC_ABS_Y = 0xF9,
+			SBC_IND_X = 0xE1,
+			SBC_IND_Y = 0xF1,
 		}
 
 		/// <summary>
@@ -251,6 +259,14 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.ADC_ABS_Y,  () => ADC(AbsoluteY())    },
 				{ OpCode.ADC_IND_X,  () => ADC(IndirectX())    },
 				{ OpCode.ADC_IND_Y,  () => ADC(IndirectY())    },
+				{ OpCode.SBC_IMD,    () => SBC(Immediate())    },
+				{ OpCode.SBC_ZERO,   () => SBC(ZeroPage())     },
+				{ OpCode.SBC_ZERO_X, () => SBC(ZeroPageX())    },
+				{ OpCode.SBC_ABS,    () => SBC(ZeroPageY())    },
+				{ OpCode.SBC_ABS_X,  () => SBC(AbsoluteX())    },
+				{ OpCode.SBC_ABS_Y,  () => SBC(AbsoluteY())    },
+				{ OpCode.SBC_IND_X,  () => SBC(IndirectX())    },
+				{ OpCode.SBC_IND_Y,  () => SBC(IndirectY())    },
 			};
 		}
 
@@ -396,10 +412,14 @@ namespace DanTup.DaNES.Emulation
 		{
 			var result = Accumulator + value + (Carry ? 1 : 0);
 			Carry = (result & 256) != 0;
+			// If both inputs have the opposite sign to the result, it's an overflow.
 			Overflow = ((Accumulator ^ result) & (value ^ result) & 128) != 0;
 			Accumulator = SetZN((byte)result);
 		}
 		void ADC(ushort address) => ADC(Ram.Read(address));
+
+		void SBC(byte value) => ADC((byte)(value ^ 0xFF)); // SBC is the same as ADC with bits inverted?
+		void SBC(ushort address) => SBC(Ram.Read(address));
 
 		byte Immediate() => ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
