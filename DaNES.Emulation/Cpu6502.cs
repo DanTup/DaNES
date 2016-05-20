@@ -60,6 +60,14 @@ namespace DanTup.DaNES.Emulation
 			CLV = 0xB8,
 			CLD = 0xD8,
 			SED = 0xF8,
+			BPL = 0x10,
+			BMI = 0x30,
+			BVC = 0x50,
+			BVS = 0x70,
+			BCC = 0x90,
+			BCS = 0xB0,
+			BNE = 0xD0,
+			BEQ = 0xF0,
 		}
 
 		/// <summary>
@@ -97,6 +105,14 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.CLV,        () => CLV()            },
 				{ OpCode.CLD,        () => CLD()            },
 				{ OpCode.SED,        () => SED()            },
+				{ OpCode.BPL,        () => Branch(!Negative)   },
+				{ OpCode.BMI,        () => Branch(Negative)    },
+				{ OpCode.BVC,        () => Branch(!Overflow)   },
+				{ OpCode.BVS,        () => Branch(Overflow)    },
+				{ OpCode.BCC,        () => Branch(!Carry)      },
+				{ OpCode.BCS,        () => Branch(Carry)       },
+				{ OpCode.BNE,        () => Branch(!ZeroResult) },
+				{ OpCode.BEQ,        () => Branch(ZeroResult)  },
 			};
 		}
 
@@ -169,6 +185,13 @@ namespace DanTup.DaNES.Emulation
 		{
 			Ram.Write(StackPointer - (value.Length - 1), value);
 			StackPointer -= (ushort)value.Length;
+		}
+
+		void Branch(bool condition)
+		{
+			var loc = ReadNext(); // Always need to consume the next byte.
+			if (condition)
+				ProgramCounter += loc;
 		}
 
 		byte Immediate() => this.ReadNext();
