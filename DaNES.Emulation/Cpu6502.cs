@@ -187,6 +187,10 @@ namespace DanTup.DaNES.Emulation
 			INC_ZERO_X = 0xF6,
 			INC_ABS = 0xEE,
 			INC_ABS_X = 0xFE,
+			DEC_ZERO = 0xC6,
+			DEC_ZERO_X = 0xD6,
+			DEC_ABS = 0xCE,
+			DEC_ABS_X = 0xDE,
 		}
 
 		/// <summary>
@@ -347,10 +351,14 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.ROL_ZERO_X, () => ROL(ZeroPageX())    },
 				{ OpCode.ROL_ABS,    () => ROL(Absolute())     },
 				{ OpCode.ROL_ABS_X,  () => ROL(AbsoluteX())    },
-				{ OpCode.INC_ZERO,   () => INC(ZeroPage())      },
-				{ OpCode.INC_ZERO_X, () => INC(ZeroPageX())      },
-				{ OpCode.INC_ABS,    () => INC(Absolute())      },
-				{ OpCode.INC_ABS_X,  () => INC(AbsoluteX())      },
+				{ OpCode.INC_ZERO,   () => INC(ZeroPage())     },
+				{ OpCode.INC_ZERO_X, () => INC(ZeroPageX())    },
+				{ OpCode.INC_ABS,    () => INC(Absolute())     },
+				{ OpCode.INC_ABS_X,  () => INC(AbsoluteX())    },
+				{ OpCode.DEC_ZERO,   () => DEC(ZeroPage())     },
+				{ OpCode.DEC_ZERO_X, () => DEC(ZeroPageX())    },
+				{ OpCode.DEC_ABS,    () => DEC(Absolute())     },
+				{ OpCode.DEC_ABS_X,  () => DEC(AbsoluteX())    },
 			};
 		}
 
@@ -487,6 +495,7 @@ namespace DanTup.DaNES.Emulation
 		void ROL_A() => Accumulator = ROL(Accumulator);
 
 		void INC(ushort address) => Ram.Write(address, SetZN((byte)(Ram.Read(address) + 1)));
+		void DEC(ushort address) => Ram.Write(address, SetZN((byte)(Ram.Read(address) - 1)));
 
 		void Push(ushort value) => Push(ToBytes(value));
 		void Push(byte[] value)
