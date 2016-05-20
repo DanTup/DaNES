@@ -66,6 +66,9 @@ namespace DanTup.DaNES.Emulation
 			// TODO: Allow passing in a speed (or "Fastest").
 			CycleDuration = TimeSpan.Zero;
 
+			// Build a dictionary of known OpCodes.
+			// A good reference can be found here:
+			//   http://www.6502.org/tutorials/6502opcodes.html
 			opCodes = new Dictionary<OpCode, Action>
 			{
 				{ OpCode.LDA_IMD,    () => LDA(Immediate()) },
