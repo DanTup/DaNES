@@ -475,7 +475,7 @@ namespace DanTup.DaNES.Emulation
 			Carry = (value & 128) != 0;
 			return SetZN((byte)((value << 1) | (old_carry ? 1 : 0)));
 		}
-		void ROL(ushort address) => Ram.Write(address, ROR(Ram.Read(address)));
+		void ROL(ushort address) => Ram.Write(address, ROL(Ram.Read(address)));
 		void ROL_A() => Accumulator = ROL(Accumulator);
 
 		void Push(ushort value) => Push(ToBytes(value));
