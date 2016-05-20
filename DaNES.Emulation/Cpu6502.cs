@@ -208,13 +208,13 @@ namespace DanTup.DaNES.Emulation
 				ProgramCounter += loc;
 		}
 
-		byte Immediate() => this.ReadNext();
+		byte Immediate() => ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
 		ushort AbsoluteX() => (ushort)(Absolute() + XRegister);
 		ushort AbsoluteY() => (ushort)(Absolute() + YRegister);
 		byte ZeroPage() => Ram.Read(ReadNext());
-		byte ZeroPageX() => Ram.Read(ReadNext() + XRegister);
-		byte ZeroPageY() => Ram.Read(ReadNext() + YRegister);
+		byte ZeroPageX() => Ram.Read((ReadNext() + XRegister) % 256);
+		byte ZeroPageY() => Ram.Read((ReadNext() + YRegister) % 256);
 		ushort IndirectX() => Ram.Read(AbsoluteX());
 		ushort IndirectY() => Ram.Read(AbsoluteY());
 

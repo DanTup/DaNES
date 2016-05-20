@@ -52,7 +52,8 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		[InlineData(255, 255, 255, false, true)]
 		public void Lda_Zero_Page_Offset_X(byte value_to_load, byte ram_location, byte offset, bool expectZero, bool expectNegative)
 		{
-			nes.Cpu.Ram.Write(ram_location + offset, value_to_load);
+			var actual_ram_location = (ram_location + offset) % 256; // Zero page operations wrap around and remain on zero page.
+			nes.Cpu.Ram.Write(actual_ram_location, value_to_load);
 			nes.Cpu.XRegister = offset;
 			nes.LoadProgram(0xB5, ram_location);
 
