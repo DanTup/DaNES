@@ -75,6 +75,7 @@ namespace DanTup.DaNES.Emulation
 			STY_ZERO_Y = 0x94,
 			STY_ABS = 0x8C,
 			JMP_ABS = 0x4C,
+			JMP_IND = 0x6C,
 			JSR = 0x20,
 			RTS = 0x60,
 			RTI = 0x40,
@@ -236,6 +237,7 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.STY_ZERO_Y, () => STY(ZeroPageY())    },
 				{ OpCode.STY_ABS,    () => STY(Absolute())     },
 				{ OpCode.JMP_ABS,    () => JMP(Absolute())     },
+				{ OpCode.JMP_IND,    () => JMP(Indirect())     },
 				{ OpCode.JSR,        () => JSR(Absolute())     },
 				{ OpCode.RTS,        () => RTS()               },
 				{ OpCode.RTI,        () => RTI()               },
@@ -570,6 +572,12 @@ namespace DanTup.DaNES.Emulation
 		ushort ZeroPage() => ReadNext();
 		ushort ZeroPageX() => (ushort)((ReadNext() + XRegister) % 256);
 		ushort ZeroPageY() => (ushort)((ReadNext() + YRegister) % 256);
+		ushort Indirect()
+		{
+			var addr1 = Absolute();
+			var addr2 = (ushort)(addr1 + 1);
+			return FromBytes(Ram.Read(addr1), Ram.Read(addr2));
+		}
 		ushort IndirectX()
 		{
 			var addr1 = ZeroPageX();
