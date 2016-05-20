@@ -2,7 +2,7 @@
 
 namespace DanTup.DaNES.Emulation.Tests.CpuTests
 {
-	public class LdaTests : CpuTests
+	class LdaTests : CpuTests
 	{
 		[Theory]
 		[InlineData(0, true, false)]
@@ -15,9 +15,9 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		{
 			Run(0xA9, value_to_load);
 
-			Assert.Equal(value_to_load, cpu.Accumulator);
-			Assert.Equal(expectZero, cpu.ZeroResult);
-			Assert.Equal(expectNegative, cpu.Negative);
+			Assert.Equal(value_to_load, nes.Cpu.Accumulator);
+			Assert.Equal(expectZero, nes.Cpu.ZeroResult);
+			Assert.Equal(expectNegative, nes.Cpu.Negative);
 		}
 
 		[Theory]
@@ -29,13 +29,13 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		[InlineData(255, 255, false, true)]
 		public void Lda_Zero_Page(byte value_to_load, byte ram_location, bool expectZero, bool expectNegative)
 		{
-			cpu.Ram.Write(ram_location, value_to_load);
+			nes.Cpu.Ram.Write(ram_location, value_to_load);
 
 			Run(0xA5, ram_location);
 
-			Assert.Equal(value_to_load, cpu.Accumulator);
-			Assert.Equal(expectZero, cpu.ZeroResult);
-			Assert.Equal(expectNegative, cpu.Negative);
+			Assert.Equal(value_to_load, nes.Cpu.Accumulator);
+			Assert.Equal(expectZero, nes.Cpu.ZeroResult);
+			Assert.Equal(expectNegative, nes.Cpu.Negative);
 		}
 
 		[Theory]
@@ -47,14 +47,14 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		[InlineData(255, 255, 255, false, true)]
 		public void Lda_Zero_Page_Offset_X(byte value_to_load, byte ram_location, byte offset, bool expectZero, bool expectNegative)
 		{
-			cpu.Ram.Write(ram_location + offset, value_to_load);
+			nes.Cpu.Ram.Write(ram_location + offset, value_to_load);
 
-			cpu.XRegister = offset;
+			nes.Cpu.XRegister = offset;
 			Run(0xB5, ram_location);
 
-			Assert.Equal(value_to_load, cpu.Accumulator);
-			Assert.Equal(expectZero, cpu.ZeroResult);
-			Assert.Equal(expectNegative, cpu.Negative);
+			Assert.Equal(value_to_load, nes.Cpu.Accumulator);
+			Assert.Equal(expectZero, nes.Cpu.ZeroResult);
+			Assert.Equal(expectNegative, nes.Cpu.Negative);
 		}
 	}
 }

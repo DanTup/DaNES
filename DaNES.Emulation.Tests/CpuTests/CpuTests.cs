@@ -1,13 +1,13 @@
 ﻿namespace DanTup.DaNES.Emulation.Tests.CpuTests
 {
-	public abstract class CpuTests
+	abstract class CpuTests
 	{
-		protected Cpu cpu = new Cpu();
+		protected Nes nes = new Nes();
 
 		protected void Run(params byte[] program)
 		{
-			cpu.LoadProgram(program, false);
-			cpu.Run();
+			nes.LoadProgram(program, false);
+			nes.Run();
 		}
 	}
 }

@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace DanTup.DaNES.Emulation
 {
-	public class Cpu
+	class Cpu6502
 	{
 		// Cycles since started.
 		public long CycleCount { get; private set; }
@@ -37,40 +37,17 @@ namespace DanTup.DaNES.Emulation
 		/// </summary>
 		int cyclesToSpend;
 
-		public Cpu()
+		public Cpu6502(Memory ram)
 		{
 			// TODO: Allow passing in a speed (or "Fastest").
 			CycleDuration = TimeSpan.Zero;
 
-			Ram = new Memory(0x10000);
+			Ram = ram;
 
 			Init();
 		}
 
-		/// <summary>
-		/// Loads a program for the CPU to execute, resetting all registers
-		/// and flags.
-		/// </summary>
-		public void LoadProgram(byte[] program)
-		{
-			LoadProgram(program, true);
-		}
-
-		/// <summary>
-		/// Loads a program for the CPU to execute, optionally resetting all
-		/// registers and flags.
-		/// </summary>
-		internal void LoadProgram(byte[] program, bool resetState)
-		{
-			// TODO: This is NES specific, needs moving out...
-			Ram.Write(0x8000, program);
-			Ram.Write(0xC000, program);
-
-			if (resetState)
-				Init();
-		}
-
-		void Init()
+		internal void Init()
 		{
 			// Reset all the registers.
 			Accumulator = 0;
@@ -163,7 +140,7 @@ namespace DanTup.DaNES.Emulation
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xF0 */
 		};
 
-		Dictionary<OpCode, Action<Cpu>> opCodes = new Dictionary<OpCode, Action<Cpu>>
+		Dictionary<OpCode, Action<Cpu6502>> opCodes = new Dictionary<OpCode, Action<Cpu6502>>
 		{
 			{ OpCode.LDA_IMD,    cpu => cpu.LDA(cpu.Immediate()) },
 			{ OpCode.LDA_ZERO,   cpu => cpu.LDA(cpu.ZeroPage())  },

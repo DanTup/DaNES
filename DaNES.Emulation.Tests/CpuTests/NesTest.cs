@@ -11,7 +11,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 	{
 		const string ExpectedLogFile = "../../NesTest/expected.txt";
 		const string RomFile = "../../NesTest/nestest.nes";
-		LoggingCpu cpu = new LoggingCpu();
+		LoggingNes nes = new LoggingNes();
 
 		[Fact]
 		public void RunNesTest()
@@ -21,7 +21,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			// the incorrect opcode the failure.
 			var ex = TryRunNesTest();
 
-			var actualLog = cpu.Log.ToString().Split('\n');
+			var actualLog = ((LoggingCpu)nes.Cpu).Log.ToString().Split('\n');
 			var expectedLog = File.ReadAllLines(ExpectedLogFile);
 
 			CompareResults(actualLog, expectedLog, ex);
@@ -95,8 +95,8 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 
 			try
 			{
-				cpu.LoadProgram(program, false);
-				cpu.Run();
+				nes.LoadProgram(program, false);
+				nes.Run();
 				return null;
 			}
 			catch (Exception x)
@@ -105,8 +105,21 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			}
 		}
 
-		class LoggingCpu : Cpu
+		class LoggingNes : Nes
 		{
+			public LoggingNes()
+			{
+				Ram = new Memory(0x10000);
+				Cpu = new LoggingCpu(Ram);
+			}
+		}
+
+		class LoggingCpu : Cpu6502
+		{
+			public LoggingCpu(Memory ram) : base(ram)
+			{
+			}
+
 			public StringBuilder Log = new StringBuilder();
 			LogInfo logInfo;
 

@@ -2,7 +2,7 @@
 
 namespace DanTup.DaNES.Emulation
 {
-	public class Memory
+	class Memory
 	{
 		byte[] memory;
 
