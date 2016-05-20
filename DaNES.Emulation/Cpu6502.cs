@@ -327,7 +327,7 @@ namespace DanTup.DaNES.Emulation
 			return value;
 		}
 
-		byte GetStatus()
+		internal byte GetStatus()
 		{
 			return (byte)(
 				(Negative ? 128 : 0)

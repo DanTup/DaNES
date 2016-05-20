@@ -82,7 +82,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 
 			// Compare this line of the log to the known-good NesTest output.
 			if (actual != expected)
-				throw new Exception(string.Format("Instruction not processed correctly at line {0}:\r\n\r\n{1} (expected)\r\n{2} (actual)\r\r{3} (previous)", i, expected, actual, i > 0 ? expectedLog[i - 1] : ""), ex);
+				throw new Exception(string.Format("Instruction not processed correctly at line {0}:\r\n\r\n{1}\r\n\r\n{2} (expected next state)\r\n{3} (actual next state)", (i - 1), i > 0 ? expectedLog[i - 1] : "", expected, actual), ex);
 		}
 
 		/// <summary>
