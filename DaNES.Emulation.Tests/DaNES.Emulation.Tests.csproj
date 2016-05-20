@@ -65,7 +65,6 @@
     <Compile Include="CpuTests\NesTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Logs\nestest.actual.log" />
     <None Include="NesTest\nestest.expected.log" />
     <None Include="packages.config" />
     <None Include="NesTest\nestest.nes" />
