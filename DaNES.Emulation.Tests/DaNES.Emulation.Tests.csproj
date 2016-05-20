@@ -64,7 +64,6 @@
     <Compile Include="CpuTests\NesTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="NesTest\nestest.expected.log" />
     <None Include="packages.config" />
     <None Include="NesTest\nestest.nes" />
   </ItemGroup>
@@ -76,6 +75,9 @@
       <Project>{f1399c8b-4cf1-4e1e-b75e-4fe269db2123}</Project>
       <Name>DaNES.Emulation</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NesTest\expected.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
