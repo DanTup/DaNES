@@ -20,25 +20,13 @@
 		internal void Run() => Cpu.Run();
 
 		/// <summary>
-		/// Loads a program for the CPU to execute, resetting all registers
-		/// and flags.
+		/// Loads a program for the CPU to execute.
 		/// </summary>
-		public void LoadProgram(byte[] program)
+		internal void LoadProgram(params byte[] program)
 		{
-			LoadProgram(program, true);
-		}
-
-		/// <summary>
-		/// Loads a program for the CPU to execute, optionally resetting all
-		/// registers and flags.
-		/// </summary>
-		internal void LoadProgram(byte[] program, bool resetState)
-		{
+			// TODO: Should we duplicate this, or just re-point requests?
 			Ram.Write(0x8000, program);
 			Ram.Write(0xC000, program);
-
-			if (resetState)
-				Cpu.Init();
 		}
 	}
 }

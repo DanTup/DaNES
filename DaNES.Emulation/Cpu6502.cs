@@ -16,8 +16,8 @@ namespace DanTup.DaNES.Emulation
 		public byte XRegister { get; internal set; }
 		public byte YRegister { get; internal set; }
 
-		public ushort ProgramCounter { get; internal set; }
-		public ushort StackPointer { get; internal set; }
+		public ushort ProgramCounter { get; internal set; } = 0xC000;
+		public ushort StackPointer { get; internal set; } = 0xFD;
 
 		// Status register.
 		public bool Negative { get; internal set; }
@@ -37,40 +37,77 @@ namespace DanTup.DaNES.Emulation
 		/// </summary>
 		int cyclesToSpend;
 
+		/// <summary>
+		/// All known OpCodes as an Enum to assign meaningful names.
+		/// </summary>
+		enum OpCode
+		{
+			LDA_IMD = 0xA9,
+			LDA_ZERO = 0xA5,
+			LDA_ZERO_X = 0xB5,
+			LDX_IMD = 0xA2,
+			LDX_ZERO = 0xA6,
+			LDX_ZERO_Y = 0xB6,
+			STX_IMD = 0x86,
+			STX_ZERO_Y = 0x96,
+			JMP_ABS = 0x4C,
+		}
+
+		// TODO: Fill these in!
+		// TODO: See if we can remove these, and just calculate them based on actual operations.
+		/// <summary>
+		/// Costs of all OpCodes.
+		/// </summary>
+		int[] opCodeCosts = new int[]
+		{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x00 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x10 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x20 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x30 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x40 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x50 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x60 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x70 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x80 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x90 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xA0 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xB0 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xC0 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xD0 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xE0 */
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xF0 */
+		};
+
+		/// <summary>
+		/// A lookup of OpCodes and their functions.
+		/// </summary>
+		readonly Dictionary<OpCode, Action> opCodes;
+
 		public Cpu6502(Memory ram)
 		{
+			Ram = ram;
+
 			// TODO: Allow passing in a speed (or "Fastest").
 			CycleDuration = TimeSpan.Zero;
 
-			Ram = ram;
-
-			Init();
-		}
-
-		internal void Init()
-		{
-			// Reset all the registers.
-			Accumulator = 0;
-			XRegister = 0;
-			YRegister = 0;
-			ProgramCounter = 0xC000;
-			StackPointer = 0xFD;
-			Negative = false;
-			Overflow = false;
-			Interrupted = false;
-			DecimalMode = false;
-			InterruptsEnabled = false;
-			ZeroResult = false;
-			Carry = false;
-
-			CycleCount = 0;
+			opCodes = new Dictionary<OpCode, Action>
+			{
+				{ OpCode.LDA_IMD,    () => LDA(Immediate()) },
+				{ OpCode.LDA_ZERO,   () => LDA(ZeroPage())  },
+				{ OpCode.LDA_ZERO_X, () => LDA(ZeroPageX()) },
+				{ OpCode.LDX_IMD,    () => LDX(Immediate()) },
+				{ OpCode.LDX_ZERO,   () => LDX(ZeroPage())  },
+				{ OpCode.LDX_ZERO_Y, () => LDX(ZeroPageY()) },
+				{ OpCode.STX_IMD,    () => STX(Immediate()) },
+				{ OpCode.STX_ZERO_Y, () => STX(ZeroPageY()) },
+				{ OpCode.JMP_ABS,    () => JMP(Absolute())  },
+			};
 		}
 
 		public void Run()
 		{
 			while (true)
 			{
-
 				DateTime startTime = DateTime.Now;
 
 				if (!ProcessNextOpCode())
@@ -100,58 +137,11 @@ namespace DanTup.DaNES.Emulation
 			if (!opCodes.ContainsKey(opCode))
 				throw new InvalidOperationException(string.Format("Unknown opcode: 0x{0}", instr.ToString("X2")));
 
-			opCodes[opCode](this);
+			opCodes[opCode]();
 			cyclesToSpend = opCodeCosts[(int)instr];
 
 			return true;
 		}
-
-		enum OpCode
-		{
-			LDA_IMD = 0xA9,
-			LDA_ZERO = 0xA5,
-			LDA_ZERO_X = 0xB5,
-			LDX_IMD = 0xA2,
-			LDX_ZERO = 0xA6,
-			LDX_ZERO_Y = 0xB6,
-			STX_IMD = 0x86,
-			STX_ZERO_Y = 0x96,
-			JMP_ABS = 0x4C,
-		}
-
-		// TODO: Fill these in!
-		int[] opCodeCosts = new int[]
-		{
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x00 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x10 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x20 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x30 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x40 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x50 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x60 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x70 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x80 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0x90 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xA0 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xB0 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xC0 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xD0 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xE0 */
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 0xF0 */
-		};
-
-		Dictionary<OpCode, Action<Cpu6502>> opCodes = new Dictionary<OpCode, Action<Cpu6502>>
-		{
-			{ OpCode.LDA_IMD,    cpu => cpu.LDA(cpu.Immediate()) },
-			{ OpCode.LDA_ZERO,   cpu => cpu.LDA(cpu.ZeroPage())  },
-			{ OpCode.LDA_ZERO_X, cpu => cpu.LDA(cpu.ZeroPageX()) },
-			{ OpCode.LDX_IMD,    cpu => cpu.LDX(cpu.Immediate()) },
-			{ OpCode.LDX_ZERO,   cpu => cpu.LDX(cpu.ZeroPage())  },
-			{ OpCode.LDX_ZERO_Y, cpu => cpu.LDX(cpu.ZeroPageY()) },
-			{ OpCode.STX_IMD,    cpu => cpu.STX(cpu.Immediate()) },
-			{ OpCode.STX_ZERO_Y, cpu => cpu.STX(cpu.ZeroPageY()) },
-			{ OpCode.JMP_ABS,    cpu => cpu.JMP(cpu.Absolute())  },
-		};
 
 		void LDA(byte value) => Accumulator = SetZN(value);
 		void LDX(byte value) => XRegister = SetZN(value);

@@ -2,8 +2,10 @@
 
 namespace DanTup.DaNES.Emulation.Tests.CpuTests
 {
-	class LdaTests : CpuTests
+	public class LdaTests
 	{
+		Nes nes = new Nes();
+
 		[Theory]
 		[InlineData(0, true, false)]
 		[InlineData(1, false, false)]
@@ -13,7 +15,9 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		[InlineData(255, false, true)]
 		public void Lda_Immediate(byte value_to_load, bool expectZero, bool expectNegative)
 		{
-			Run(0xA9, value_to_load);
+			nes.LoadProgram(0xA9, value_to_load);
+
+			nes.Run();
 
 			Assert.Equal(value_to_load, nes.Cpu.Accumulator);
 			Assert.Equal(expectZero, nes.Cpu.ZeroResult);
@@ -30,8 +34,9 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		public void Lda_Zero_Page(byte value_to_load, byte ram_location, bool expectZero, bool expectNegative)
 		{
 			nes.Cpu.Ram.Write(ram_location, value_to_load);
+			nes.LoadProgram(0xA5, ram_location);
 
-			Run(0xA5, ram_location);
+			nes.Run();
 
 			Assert.Equal(value_to_load, nes.Cpu.Accumulator);
 			Assert.Equal(expectZero, nes.Cpu.ZeroResult);
@@ -48,9 +53,10 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		public void Lda_Zero_Page_Offset_X(byte value_to_load, byte ram_location, byte offset, bool expectZero, bool expectNegative)
 		{
 			nes.Cpu.Ram.Write(ram_location + offset, value_to_load);
-
 			nes.Cpu.XRegister = offset;
-			Run(0xB5, ram_location);
+			nes.LoadProgram(0xB5, ram_location);
+
+			nes.Run();
 
 			Assert.Equal(value_to_load, nes.Cpu.Accumulator);
 			Assert.Equal(expectZero, nes.Cpu.ZeroResult);

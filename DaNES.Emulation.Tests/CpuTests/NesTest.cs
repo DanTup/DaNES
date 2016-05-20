@@ -95,7 +95,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 
 			try
 			{
-				nes.LoadProgram(program, false);
+				nes.LoadProgram(program);
 				nes.Run();
 				return null;
 			}
