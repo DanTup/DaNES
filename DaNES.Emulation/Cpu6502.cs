@@ -42,6 +42,7 @@ namespace DanTup.DaNES.Emulation
 		/// </summary>
 		enum OpCode
 		{
+			NOP = 0xEA,
 			LDA_IMD = 0xA9,
 			LDA_ZERO = 0xA5,
 			LDA_ZERO_X = 0xB5,
@@ -78,6 +79,7 @@ namespace DanTup.DaNES.Emulation
 			//   http://www.6502.org/tutorials/6502opcodes.html
 			opCodes = new Dictionary<OpCode, Action>
 			{
+				{ OpCode.NOP,        () => NOP()            },
 				{ OpCode.LDA_IMD,    () => LDA(Immediate()) },
 				{ OpCode.LDA_ZERO,   () => LDA(ZeroPage())  },
 				{ OpCode.LDA_ZERO_X, () => LDA(ZeroPageX()) },
@@ -136,6 +138,8 @@ namespace DanTup.DaNES.Emulation
 
 			return true;
 		}
+
+		void NOP() { }
 
 		void LDA(byte value) => Accumulator = SetZN(value);
 		void LDX(byte value) => XRegister = SetZN(value);
