@@ -116,6 +116,14 @@ namespace DanTup.DaNES.Emulation
 			EOR_ABS_Y = 0x59,
 			EOR_IND_X = 0x41,
 			EOR_IND_Y = 0x51,
+			ADC_IMD = 0x69,
+			ADC_ZERO = 0x65,
+			ADC_ZERO_X = 0x75,
+			ADC_ABS = 0x6D,
+			ADC_ABS_X = 0x7D,
+			ADC_ABS_Y = 0x79,
+			ADC_IND_X = 0x61,
+			ADC_IND_Y = 0x71,
 		}
 
 		/// <summary>
@@ -209,6 +217,14 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.EOR_ABS_Y,  () => EOR(AbsoluteY())    },
 				{ OpCode.EOR_IND_X,  () => EOR(IndirectX())    },
 				{ OpCode.EOR_IND_Y,  () => EOR(IndirectY())    },
+				{ OpCode.ADC_IMD,    () => ADC(Immediate())    },
+				{ OpCode.ADC_ZERO,   () => ADC(ZeroPage())     },
+				{ OpCode.ADC_ZERO_X, () => ADC(ZeroPageX())    },
+				{ OpCode.ADC_ABS,    () => ADC(ZeroPageY())    },
+				{ OpCode.ADC_ABS_X,  () => ADC(AbsoluteX())    },
+				{ OpCode.ADC_ABS_Y,  () => ADC(AbsoluteY())    },
+				{ OpCode.ADC_IND_X,  () => ADC(IndirectX())    },
+				{ OpCode.ADC_IND_Y,  () => ADC(IndirectY())    },
 			};
 		}
 
@@ -326,6 +342,15 @@ namespace DanTup.DaNES.Emulation
 
 		void EOR(byte value) => Accumulator = SetZN((byte)(Accumulator ^ value));
 		void EOR(ushort address) => EOR(Ram.Read(address));
+
+		void ADC(byte value)
+		{
+			var result = Accumulator + value + (Carry ? 1 : 0);
+			Carry = (result & 256) != 0;
+			Overflow = ((Accumulator ^ result) & (value ^ result) & 128) != 0;
+			Accumulator = SetZN((byte)result);
+		}
+		void ADC(ushort address) => ADC(Ram.Read(address));
 
 		byte Immediate() => ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
