@@ -109,13 +109,13 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			public LoggingNes()
 			{
 				Ram = new Memory(0x10000);
-				Cpu = new LoggingCpu(Ram);
+				Cpu = new LoggingCpu(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
 			}
 		}
 
 		class LoggingCpu : Cpu6502
 		{
-			public LoggingCpu(Memory ram) : base(ram)
+			public LoggingCpu(Memory ram, ushort programCounter, ushort stackPointer) : base(ram, programCounter, stackPointer)
 			{
 			}
 

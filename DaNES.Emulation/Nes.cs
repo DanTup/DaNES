@@ -5,16 +5,13 @@
 		internal Cpu6502 Cpu { get; set; }
 		internal Memory Ram { get; set; }
 
+		protected const ushort InitialProgramCounter = 0xC000;
+		protected const ushort InitialStackPointer = 0xFD;
+
 		public Nes()
 		{
 			Ram = new Memory(0x10000);
-			Cpu = new Cpu6502(Ram);
-		}
-
-		internal Nes(Cpu6502 cpu, Memory ram)
-		{
-			Cpu = cpu;
-			Ram = ram;
+			Cpu = new Cpu6502(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
 		}
 
 		internal void Run() => Cpu.Run();

@@ -215,9 +215,12 @@ namespace DanTup.DaNES.Emulation
 		/// </summary>
 		readonly ImmutableDictionary<OpCode, Action> opCodes;
 
-		public Cpu6502(Memory ram)
+		public Cpu6502(Memory ram, ushort programCounter, ushort stackPointer)
 			: base(ram)
 		{
+			this.ProgramCounter = programCounter;
+			this.StackPointer = stackPointer;
+
 			// Build a dictionary of known OpCodes.
 			// A good reference can be found here:
 			//   http://www.6502.org/tutorials/6502opcodes.html
