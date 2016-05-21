@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 
 namespace DanTup.DaNES.Emulation
@@ -223,7 +224,7 @@ namespace DanTup.DaNES.Emulation
 		/// <summary>
 		/// A lookup of OpCodes and their functions.
 		/// </summary>
-		readonly Dictionary<OpCode, Action> opCodes;
+		readonly ImmutableDictionary<OpCode, Action> opCodes;
 
 		public Cpu6502(Memory ram)
 		{
@@ -417,7 +418,7 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.DEC_ZERO_X, () => DEC(ZeroPageX())    },
 				{ OpCode.DEC_ABS,    () => DEC(Absolute())     },
 				{ OpCode.DEC_ABS_X,  () => DEC(AbsoluteX())    },
-			};
+			}.ToImmutableDictionary();
 		}
 
 		public void Run()
