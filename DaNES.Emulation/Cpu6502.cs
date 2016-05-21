@@ -5,20 +5,12 @@ using System.Threading;
 
 namespace DanTup.DaNES.Emulation
 {
-	class Cpu6502
+	class Cpu6502 : Cpu
 	{
-		// Cycles since started.
-		public long CycleCount { get; private set; }
-
-		public TimeSpan CycleDuration { get; private set; }
-
 		// Registers.
 		public byte Accumulator { get; internal set; }
 		public byte XRegister { get; internal set; }
 		public byte YRegister { get; internal set; }
-
-		public ushort ProgramCounter { get; internal set; } = 0xC000;
-		public ushort StackPointer { get; internal set; } = 0xFD;
 
 		// Status register.
 		public bool Negative { get; internal set; }
@@ -28,9 +20,6 @@ namespace DanTup.DaNES.Emulation
 		public bool InterruptsDisabled { get; internal set; } = true;
 		public bool ZeroResult { get; internal set; }
 		public bool Carry { get; internal set; }
-
-		// Memory.
-		public Memory Ram { get; private set; }
 
 		/// <summary>
 		/// Keeps track of how many cycles an operation is expected to take so we can
@@ -227,12 +216,8 @@ namespace DanTup.DaNES.Emulation
 		readonly ImmutableDictionary<OpCode, Action> opCodes;
 
 		public Cpu6502(Memory ram)
+			: base(ram)
 		{
-			Ram = ram;
-
-			// TODO: Allow passing in a speed (or "Fastest").
-			CycleDuration = TimeSpan.Zero;
-
 			// Build a dictionary of known OpCodes.
 			// A good reference can be found here:
 			//   http://www.6502.org/tutorials/6502opcodes.html
@@ -437,7 +422,7 @@ namespace DanTup.DaNES.Emulation
 					// Sleep for however long is left for this cycle.
 					if (currentCycleRemainingDuration > TimeSpan.Zero)
 						Thread.Sleep(currentCycleRemainingDuration);
-					CycleCount++;
+					TotalCycles++;
 					// Sleep for full duration on subsequent cycles.
 					currentCycleRemainingDuration = CycleDuration;
 				}

@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cpu.cs" />
     <Compile Include="Cpu6502.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="Nes.cs" />
