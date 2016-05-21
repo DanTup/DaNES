@@ -38,7 +38,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cpu6502.Costs.cs" />
     <Compile Include="Cpu6502.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="Nes.cs" />

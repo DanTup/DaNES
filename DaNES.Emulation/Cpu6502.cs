@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace DanTup.DaNES.Emulation
 {
-	partial class Cpu6502
+	class Cpu6502
 	{
 		// Cycles since started.
 		public long CycleCount { get; private set; }
@@ -454,7 +454,9 @@ namespace DanTup.DaNES.Emulation
 				throw new InvalidOperationException(string.Format("Unknown opcode: 0x{0}", instr.ToString("X2")));
 
 			opCodes[opCode]();
-			cyclesToSpend = opCodeCosts[instr];
+
+			// TODO: Count costs...
+			//cyclesToSpend = ???;
 
 			return true;
 		}
