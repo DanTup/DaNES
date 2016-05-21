@@ -40,9 +40,35 @@ namespace DanTup.DaNES.Emulation
 		/// <summary>
 		/// All known OpCodes as an Enum to assign meaningful names.
 		/// </summary>
-		enum OpCode
+		internal enum OpCode
 		{
 			NOP = 0xEA,
+			NOP_1 = 0x1A,
+			NOP_2 = 0x3A,
+			NOP_3 = 0x5A,
+			NOP_4 = 0x7A,
+			NOP_5 = 0xDA,
+			NOP_6 = 0xFA,
+			SKB_1 = 0x80,
+			SKB_2 = 0x82,
+			SKB_3 = 0xC2,
+			SKB_4 = 0xE2,
+			SKB_5 = 0x04,
+			SKB_6 = 0x14,
+			SKB_7 = 0x34,
+			SKB_8 = 0x44,
+			SKB_9 = 0x54,
+			SKB_10 = 0x64,
+			SKB_11 = 0x74,
+			SKB_12 = 0xD4,
+			SKB_13 = 0xF4,
+			SKW_1 = 0x0C,
+			SKW_2 = 0x1C,
+			SKW_3 = 0x3C,
+			SKW_4 = 0x5C,
+			SKW_5 = 0x7C,
+			SKW_6 = 0xDC,
+			SKW_7 = 0xFC,
 			LDA_IMD = 0xA9,
 			LDA_ZERO = 0xA5,
 			LDA_ZERO_X = 0xB5,
@@ -72,7 +98,7 @@ namespace DanTup.DaNES.Emulation
 			STX_ZERO_Y = 0x96,
 			STX_ABS = 0x8E,
 			STY_IMD = 0x84,
-			STY_ZERO_Y = 0x94,
+			STY_ZERO_X = 0x94,
 			STY_ABS = 0x8C,
 			JMP_ABS = 0x4C,
 			JMP_IND = 0x6C,
@@ -209,9 +235,39 @@ namespace DanTup.DaNES.Emulation
 			// Build a dictionary of known OpCodes.
 			// A good reference can be found here:
 			//   http://www.6502.org/tutorials/6502opcodes.html
+
+			// TODO: It's possible we can reduce this due to patterns in ops/address modes:
+			// http://nesdev.com/6502_cpu.txt
+
 			opCodes = new Dictionary<OpCode, Action>
 			{
 				{ OpCode.NOP,        () => NOP()               },
+				{ OpCode.NOP_1,      () => NOP()               },
+				{ OpCode.NOP_2,      () => NOP()               },
+				{ OpCode.NOP_3,      () => NOP()               },
+				{ OpCode.NOP_4,      () => NOP()               },
+				{ OpCode.NOP_5,      () => NOP()               },
+				{ OpCode.NOP_6,      () => NOP()               },
+				{ OpCode.SKB_1,      () => NOP(Immediate())    },
+				{ OpCode.SKB_2,      () => NOP(ZeroPage())     },
+				{ OpCode.SKB_3,      () => NOP(ZeroPage())     },
+				{ OpCode.SKB_4,      () => NOP(ZeroPage())     },
+				{ OpCode.SKB_5,      () => NOPR(ZeroPage())    },
+				{ OpCode.SKB_6,      () => NOPR(ZeroPageX())   },
+				{ OpCode.SKB_7,      () => NOPR(ZeroPageX())   },
+				{ OpCode.SKB_8,      () => NOPR(ZeroPage())    },
+				{ OpCode.SKB_9,      () => NOPR(ZeroPageX())   },
+				{ OpCode.SKB_10,     () => NOPR(ZeroPage())    },
+				{ OpCode.SKB_11,     () => NOPR(ZeroPageX())   },
+				{ OpCode.SKB_12,     () => NOPR(ZeroPageX())   },
+				{ OpCode.SKB_13,     () => NOPR(ZeroPageX())   },
+				{ OpCode.SKW_1,      () => NOPR(Absolute())    },
+				{ OpCode.SKW_2,      () => NOPR(AbsoluteX())   },
+				{ OpCode.SKW_3,      () => NOPR(AbsoluteX())   },
+				{ OpCode.SKW_4,      () => NOPR(AbsoluteX())   },
+				{ OpCode.SKW_5,      () => NOPR(AbsoluteX())   },
+				{ OpCode.SKW_6,      () => NOPR(AbsoluteX())   },
+				{ OpCode.SKW_7,      () => NOPR(AbsoluteX())   },
 				{ OpCode.LDA_IMD,    () => LDA(Immediate())    },
 				{ OpCode.LDA_ZERO,   () => LDA(ZeroPage())     },
 				{ OpCode.LDA_ZERO_X, () => LDA(ZeroPageX())    },
@@ -230,11 +286,11 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.LDY_ZERO_X, () => LDY(ZeroPageX())    },
 				{ OpCode.LDY_ABS,    () => LDY(Absolute())     },
 				{ OpCode.LDY_ABS_X,  () => LDY(AbsoluteX())    },
-				{ OpCode.STX_IMD,    () => STX(Immediate())    },
+				{ OpCode.STX_IMD,    () => STX(ImmediateW())   },
 				{ OpCode.STX_ZERO_Y, () => STX(ZeroPageY())    },
 				{ OpCode.STX_ABS,    () => STX(Absolute())     },
-				{ OpCode.STY_IMD,    () => STY(Immediate())    },
-				{ OpCode.STY_ZERO_Y, () => STY(ZeroPageY())    },
+				{ OpCode.STY_IMD,    () => STY(ImmediateW())   },
+				{ OpCode.STY_ZERO_X, () => STY(ZeroPageX())    },
 				{ OpCode.STY_ABS,    () => STY(Absolute())     },
 				{ OpCode.JMP_ABS,    () => JMP(Absolute())     },
 				{ OpCode.JMP_IND,    () => JMP(Indirect())     },
@@ -387,7 +443,7 @@ namespace DanTup.DaNES.Emulation
 			}
 		}
 
-		public virtual bool ProcessNextOpCode()
+		internal virtual bool ProcessNextOpCode()
 		{
 			var instr = ReadNext();
 			if (instr == 0)
@@ -398,12 +454,17 @@ namespace DanTup.DaNES.Emulation
 				throw new InvalidOperationException(string.Format("Unknown opcode: 0x{0}", instr.ToString("X2")));
 
 			opCodes[opCode]();
-			cyclesToSpend = opCodeCosts[(int)instr];
+			cyclesToSpend = opCodeCosts[instr];
 
 			return true;
 		}
 
 		void NOP() { }
+		void NOP(ushort address) { }
+		// TODO: These reads are pointless and exist only to allow us to get the same output as Nintendulator
+		// running nestest. Once we're not using the logs for debugging, this can probably be removed...
+		// Unless it makes cycle-cost counting easier, in which case they might remain?
+		void NOPR(ushort address) => Ram.Read(address);
 
 		void LDA(byte value) => Accumulator = SetZN(value);
 		void LDA(ushort address) => Accumulator = SetZN(Ram.Read(address));
@@ -509,16 +570,6 @@ namespace DanTup.DaNES.Emulation
 
 		byte Pop() => Ram.Read((ushort)(0x100 + ++StackPointer));
 
-		void Branch(bool condition)
-		{
-			var loc = ReadNext(); // Always need to consume the next byte.
-			if (condition)
-				ProgramCounter += loc;
-
-			byte b = byte.MinValue;
-			var a = b & b;
-		}
-
 		void AND(byte value) => Accumulator = SetZN((byte)(Accumulator & value));
 		void AND(ushort address) => AND(Ram.Read(address));
 
@@ -566,6 +617,7 @@ namespace DanTup.DaNES.Emulation
 		void SBC(ushort address) => SBC(Ram.Read(address));
 
 		byte Immediate() => ReadNext();
+		byte ImmediateW() => ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
 		ushort AbsoluteX() => (ushort)(FromBytes(ReadNext(), ReadNext()) + XRegister);
 		ushort AbsoluteY() => (ushort)(FromBytes(ReadNext(), ReadNext()) + YRegister);
@@ -598,7 +650,7 @@ namespace DanTup.DaNES.Emulation
 			return (ushort)(FromBytes(Ram.Read(addr1), Ram.Read((ushort)(addr2 % 256))) + YRegister);
 		}
 
-		protected virtual byte ReadNext() => Ram.Read(ProgramCounter++);
+		internal virtual byte ReadNext() => Ram.Read(ProgramCounter++);
 
 		byte SetZN(byte value)
 		{
@@ -635,6 +687,9 @@ namespace DanTup.DaNES.Emulation
 		}
 
 		byte[] ToBytes(ushort value) => new[] { (byte)(value >> 8), (byte)value };
-		ushort FromBytes(byte b1, byte b2) => (ushort)(b1 | b2 << 8);
+		protected ushort FromBytes(byte b1, byte b2) => (ushort)(b1 | b2 << 8);
+
+		void Branch(bool condition) => BranchIf(condition, ReadNext());
+		void BranchIf(bool condition, ushort offset) => ProgramCounter += (ushort)(condition ? offset : 0);
 	}
 }

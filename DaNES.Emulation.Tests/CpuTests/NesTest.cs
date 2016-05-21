@@ -76,13 +76,12 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		{
 			// We don't currently have the middle part of this log (it's really just a repeat of the first few bytes)
 			// so just strip it out.
-			// TODO: Don't chop the end off either....
-			var actual = actualLog[i].Substring(0, 16) + actualLog[i].Substring(48, 25);
-			var expected = expectedLog[i].Substring(0, 16) + expectedLog[i].Substring(48, 25);
+			var actual = actualLog[i].Substring(0, 15) + actualLog[i].Substring(48, 25);
+			var expected = expectedLog[i].Substring(0, 15) + expectedLog[i].Substring(48, 25);
 
 			// Compare this line of the log to the known-good NesTest output.
 			if (actual != expected)
-				throw new Exception(string.Format("Instruction not processed correctly at line {0}:\r\n\r\n{1}\r\n\r\n{2} (expected next state)\r\n{3} (actual next state)", i, i > 0 ? expectedLog[i - 1] : "", expected, actual), ex);
+				throw new Exception(string.Format("Unexpected state at line {0}:\r\n\r\n{1} (expected next state)\r\n{2} (actual next state)\r\n\r\nLast instruction:\r\n{3}", i + 1, expected, actual, i > 0 ? expectedLog[i - 1] : ""), ex);
 		}
 
 		/// <summary>
@@ -135,14 +134,14 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 					return string.Format(
 						"{0}{1}{2}{3}",
 						ProgramCounter.ToString("X4").PadRight(6),
-						string.Join(" ", BytesRead.Select(b => b.ToString("X2"))).PadRight(10),
-						"".PadRight(32), // TODO: Don't bother with this for now, it's kinda complicated :)
+						string.Join(" ", BytesRead.Select(b => b.ToString("X2"))).PadRight(9),
+						"".PadRight(33),
 						Registers
 					);
 				}
 			}
 
-			public override bool ProcessNextOpCode()
+			internal override bool ProcessNextOpCode()
 			{
 				logInfo = new LogInfo();
 				logInfo.ProgramCounter = ProgramCounter;
@@ -158,7 +157,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 				}
 			}
 
-			protected override byte ReadNext()
+			internal override byte ReadNext()
 			{
 				var result = base.ReadNext();
 
