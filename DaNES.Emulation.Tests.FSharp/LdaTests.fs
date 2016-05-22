@@ -1,17 +1,19 @@
 ﻿module LdaTests
 
 open System
-open Xunit
+open FsCheck.Xunit
 
-[<Theory>]
-[<InlineData(0, true, false)>]
-[<InlineData(1, false, false)>]
-[<InlineData(127, false, false)>]
-[<InlineData(128, false, true)>]
-[<InlineData(129, false, true)>]
-[<InlineData(255, false, true)>]
-let lda_immediate value_to_load expect_zero expect_negative =
-    let state = run [ byte Opcode.LDA_IMD; value_to_load ]
-    state.Accumulator |> shouldBe value_to_load
-    state.ZeroResult |> shouldBe expect_zero
-    state.Negative |> shouldBe expect_negative
+[<Property>]
+let lda_immediate_a x =
+    let state = run [ byte Opcode.LDA_IMD; x ]
+    state.Accumulator = x
+
+[<Property>]
+let lda_immediate_z x =
+    let state = run [ byte Opcode.LDA_IMD; x ]
+    state.ZeroResult = (x = 0uy)
+
+[<Property>]
+let lda_immediate_n x =
+    let state = run [ byte Opcode.LDA_IMD; x ]
+    state.Negative = (x > 127uy)
