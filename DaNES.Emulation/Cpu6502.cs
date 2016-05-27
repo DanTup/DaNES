@@ -198,6 +198,13 @@ namespace DanTup.DaNES.Emulation
 			DCP_ABS_Y = 0xDB,
 			DCP_IND_X = 0xC3,
 			DCP_IND_Y = 0xD3,
+			ISC_ZERO = 0xE7,
+			ISC_ZERO_X = 0xF7,
+			ISC_ABS = 0xEF,
+			ISC_ABS_X = 0xFF,
+			ISC_ABS_Y = 0xFB,
+			ISC_IND_X = 0xE3,
+			ISC_IND_Y = 0xF3,
 			LSR_A = 0x4A,
 			LSR_ZERO = 0x46,
 			LSR_ZERO_X = 0x56,
@@ -414,6 +421,13 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.DCP_ABS_Y,  () => DCP(AbsoluteY())    },
 				{ OpCode.DCP_IND_X,  () => DCP(IndirectX())    },
 				{ OpCode.DCP_IND_Y,  () => DCP(IndirectY())    },
+				{ OpCode.ISC_ZERO,   () => ISC(ZeroPage())     },
+				{ OpCode.ISC_ZERO_X, () => ISC(ZeroPageX())    },
+				{ OpCode.ISC_ABS,    () => ISC(Absolute())     },
+				{ OpCode.ISC_ABS_X,  () => ISC(AbsoluteX())    },
+				{ OpCode.ISC_ABS_Y,  () => ISC(AbsoluteY())    },
+				{ OpCode.ISC_IND_X,  () => ISC(IndirectX())    },
+				{ OpCode.ISC_IND_Y,  () => ISC(IndirectY())    },
 				{ OpCode.LSR_A,            LSR_A               },
 				{ OpCode.LSR_ZERO,   () => LSR(ZeroPage())     },
 				{ OpCode.LSR_ZERO_X, () => LSR(ZeroPageX())    },
@@ -648,6 +662,7 @@ namespace DanTup.DaNES.Emulation
 		void SBC(ushort address) => SBC(Ram.Read(address));
 
 		void DCP(ushort address) => Ram.Write(address, (byte)(Ram.Read(address) - 1));
+		void ISC(ushort address) => Accumulator -= SetZN(Ram.Write(address, (byte)(Ram.Read(address) + 1)));
 
 		byte Immediate() => ReadNext();
 		byte ImmediateW() => ReadNext();
