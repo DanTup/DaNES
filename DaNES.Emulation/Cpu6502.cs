@@ -191,6 +191,13 @@ namespace DanTup.DaNES.Emulation
 			SBC_IND_X = 0xE1,
 			SBC_IND_Y = 0xF1,
 			SBC = 0xEB,
+			DCP_ZERO = 0xC7,
+			DCP_ZERO_X = 0xD7,
+			DCP_ABS = 0xCF,
+			DCP_ABS_X = 0xDF,
+			DCP_ABS_Y = 0xDB,
+			DCP_IND_X = 0xC3,
+			DCP_IND_Y = 0xD3,
 			LSR_A = 0x4A,
 			LSR_ZERO = 0x46,
 			LSR_ZERO_X = 0x56,
@@ -400,6 +407,13 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.SBC_IND_X,  () => SBC(IndirectX())    },
 				{ OpCode.SBC_IND_Y,  () => SBC(IndirectY())    },
 				{ OpCode.SBC,        () => SBC(Immediate())    },
+				{ OpCode.DCP_ZERO,   () => DCP(ZeroPage())     },
+				{ OpCode.DCP_ZERO_X, () => DCP(ZeroPageX())    },
+				{ OpCode.DCP_ABS,    () => DCP(Absolute())     },
+				{ OpCode.DCP_ABS_X,  () => DCP(AbsoluteX())    },
+				{ OpCode.DCP_ABS_Y,  () => DCP(AbsoluteY())    },
+				{ OpCode.DCP_IND_X,  () => DCP(IndirectX())    },
+				{ OpCode.DCP_IND_Y,  () => DCP(IndirectY())    },
 				{ OpCode.LSR_A,            LSR_A               },
 				{ OpCode.LSR_ZERO,   () => LSR(ZeroPage())     },
 				{ OpCode.LSR_ZERO_X, () => LSR(ZeroPageX())    },
@@ -632,6 +646,8 @@ namespace DanTup.DaNES.Emulation
 
 		void SBC(byte value) => ADC((byte)(value ^ 0xFF)); // SBC is the same as ADC with bits inverted?
 		void SBC(ushort address) => SBC(Ram.Read(address));
+
+		void DCP(ushort address) => Ram.Write(address, (byte)(Ram.Read(address) - 1));
 
 		byte Immediate() => ReadNext();
 		byte ImmediateW() => ReadNext();
