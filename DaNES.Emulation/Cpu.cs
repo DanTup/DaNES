@@ -4,9 +4,9 @@
 	{
 		public ushort ProgramCounter { get; internal protected set; }
 		public ushort StackPointer { get; protected set; }
-		public Memory Ram { get; }
+		public MemoryMap Ram { get; }
 
-		public Cpu(Memory ram)
+		public Cpu(MemoryMap ram)
 		{
 			Ram = ram;
 		}

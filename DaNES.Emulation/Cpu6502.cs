@@ -233,7 +233,7 @@ namespace DanTup.DaNES.Emulation
 		/// </summary>
 		readonly ImmutableDictionary<OpCode, Action> opCodes;
 
-		public Cpu6502(Memory ram, ushort programCounter, ushort stackPointer)
+		public Cpu6502(MemoryMap ram, ushort programCounter, ushort stackPointer)
 			: base(ram)
 		{
 			this.ProgramCounter = programCounter;

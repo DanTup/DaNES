@@ -102,7 +102,7 @@ namespace DanTup.DaNES.Emulation
 			}
 		}
 
-		public void WriteRegister(ushort address, byte value)
+		public byte WriteRegister(ushort address, byte value)
 		{
 			// CPU addresses registers as 8 bytes from 0x2000 + 0x4014.
 			// https://en.wikibooks.org/wiki/NES_Programming/Memory_Map
@@ -154,6 +154,8 @@ namespace DanTup.DaNES.Emulation
 				default:
 					throw new InvalidOperationException(string.Format("Invalid attempt to write to PPU address {0:X2}", address));
 			}
+
+			return value;
 		}
 	}
 }
