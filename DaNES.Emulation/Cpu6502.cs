@@ -666,7 +666,7 @@ namespace DanTup.DaNES.Emulation
 		void SBC(ushort address) => SBC(Ram.Read(address));
 
 		void DCP(ushort address) => SetZN((byte)(Accumulator - Ram.Write(address, (byte)(Ram.Read(address) - 1))));
-		void ISC(ushort address) => Accumulator -= SetZN(Ram.Write(address, (byte)(Ram.Read(address) + 1)));
+		void ISC(ushort address) => SetZN(Accumulator -= Ram.Write(address, (byte)(Ram.Read(address) + 1))); // TODO: This might need to set O?
 
 		byte Immediate() => ReadNext();
 		byte ImmediateW() => ReadNext();
