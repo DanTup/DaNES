@@ -7,20 +7,23 @@ namespace DanTup.DaNES.Emulation
 	{
 		internal TimeSpan PpuCycleDuration { get; set; }
 		DateTime lastTick = DateTime.Now;
+		internal Memory CpuRam { get; set; }
 		internal Cpu6502 Cpu { get; set; }
-		internal Memory Ram { get; set; }
+		internal Memory PpuRam { get; set; }
+		internal Ppu Ppu { get; set; }
 
 		protected const ushort InitialProgramCounter = 0xC004; /* TOOD: This is correct for nestest (non-automated), but we need to read from reset vector */
 		protected const ushort InitialStackPointer = 0xFD;
 
 		public Nes()
 		{
-			Ram = new Memory(0x10000);
-			Cpu = new Cpu6502(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
+			CpuRam = new Memory(0x10000);
+			Cpu = new Cpu6502(CpuRam, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
+			PpuRam = new Memory(0x4000);
+			Ppu = new Ppu(PpuRam);
 
 			var ppuSpeed = 21.477272 / 4;
 			PpuCycleDuration = TimeSpan.FromMilliseconds(1.0f / ppuSpeed);
-
 		}
 
 		public void Run()
@@ -55,8 +58,8 @@ namespace DanTup.DaNES.Emulation
 		public void LoadProgram(params byte[] program)
 		{
 			// TODO: Should we duplicate this, or just re-point requests?
-			Ram.Write(0x8000, program);
-			Ram.Write(0xC000, program);
+			CpuRam.Write(0x8000, program);
+			CpuRam.Write(0xC000, program);
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace DanTup.DaNES.Emulation
 		public bool InterruptsDisabled { get; internal set; } = true;
 		public bool ZeroResult { get; internal set; }
 		public bool Carry { get; internal set; }
-		
+
 		/// <summary>
 		/// All known OpCodes as an Enum to assign meaningful names.
 		/// </summary>

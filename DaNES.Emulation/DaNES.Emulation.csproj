@@ -46,6 +46,7 @@
     <Compile Include="Cpu6502.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="Nes.cs" />
+    <Compile Include="Ppu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
