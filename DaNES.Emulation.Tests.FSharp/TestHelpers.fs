@@ -3,6 +3,7 @@ module TestHelpers
 
 open DanTup.DaNES.Emulation
 open Xunit
+open FsCheck
 
 type Opcode = Cpu6502.OpCode
 
@@ -16,3 +17,16 @@ let run bytes =
     nes.LoadProgram(bytes |> List.toArray)
     nes.Run()
     nes.Cpu
+
+// Ensure tests that take bytes get sensible initial values.
+type MyGenerators =
+    static member Byte() =
+        {
+            new Arbitrary<byte>() with
+            override x.Generator = Gen.choose(0, 1) |> Gen.map byte
+            override x.Shrinker t = Seq.empty
+        }
+
+
+TODO: Make me work
+Arb.register<MyGenerators>() |> ignore
