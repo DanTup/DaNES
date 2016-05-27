@@ -4,7 +4,15 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 {
 	public class LdaTests
 	{
-		Nes nes = new Nes();
+		class TestNes : Nes
+		{
+			public TestNes() : base()
+			{
+				Cpu.ProgramCounter = 0x8000;
+			}
+		}
+
+		Nes nes = new TestNes();
 
 		[Theory]
 		[InlineData(0, true, false)]

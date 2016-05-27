@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Threading;
 
 namespace DanTup.DaNES.Emulation
 {
@@ -21,13 +19,7 @@ namespace DanTup.DaNES.Emulation
 		public bool InterruptsDisabled { get; internal set; } = true;
 		public bool ZeroResult { get; internal set; }
 		public bool Carry { get; internal set; }
-
-		/// <summary>
-		/// Keeps track of how many cycles an operation is expected to take so we can
-		/// keep the correct timing.
-		/// </summary>
-		int cyclesToSpend;
-
+		
 		/// <summary>
 		/// All known OpCodes as an Enum to assign meaningful names.
 		/// </summary>
@@ -464,28 +456,13 @@ namespace DanTup.DaNES.Emulation
 			}.ToImmutableDictionary();
 		}
 
-		public void Run()
+		int cyclesToSpend;
+		public int? Step()
 		{
-			while (true)
-			{
-				DateTime startTime = DateTime.Now;
+			if (!ProcessNextOpCode())
+				return null;
 
-				Debug.WriteLine(string.Format("PC: {0}", ProgramCounter.ToString("X4")));
-				if (!ProcessNextOpCode())
-					break;
-
-				// Subtract processing time from initial cycle.
-				var currentCycleRemainingDuration = CycleDuration - (DateTime.Now - startTime);
-				while (cyclesToSpend-- > 0)
-				{
-					// Sleep for however long is left for this cycle.
-					if (currentCycleRemainingDuration > TimeSpan.Zero)
-						Thread.Sleep(currentCycleRemainingDuration);
-					TotalCycles++;
-					// Sleep for full duration on subsequent cycles.
-					currentCycleRemainingDuration = CycleDuration;
-				}
-			}
+			return cyclesToSpend;
 		}
 
 		internal virtual bool ProcessNextOpCode()
@@ -501,7 +478,7 @@ namespace DanTup.DaNES.Emulation
 			opCodes[opCode]();
 
 			// TODO: Count costs...
-			//cyclesToSpend = ???;
+			cyclesToSpend = 0;
 
 			return true;
 		}
