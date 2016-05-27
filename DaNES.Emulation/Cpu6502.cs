@@ -140,6 +140,10 @@ namespace DanTup.DaNES.Emulation
 			AND_ABS_Y = 0x39,
 			AND_IND_X = 0x21,
 			AND_IND_Y = 0x31,
+			AAX_ZERO = 0x87,
+			AAX_ZERO_Y = 0x97,
+			AAX_ABS = 0x8F,
+			AAX_IND_X = 0x83,
 			CMP_IMD = 0xC9,
 			CMP_ZERO = 0xC5,
 			CMP_ZERO_X = 0xD5,
@@ -344,6 +348,10 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.AND_ABS_Y,  () => AND(AbsoluteY())    },
 				{ OpCode.AND_IND_X,  () => AND(IndirectX())    },
 				{ OpCode.AND_IND_Y,  () => AND(IndirectY())    },
+				{ OpCode.AAX_ZERO,   () => AAX(ZeroPage())     },
+				{ OpCode.AAX_ZERO_Y, () => AAX(ZeroPageY())    },
+				{ OpCode.AAX_ABS,    () => AAX(Absolute())     },
+				{ OpCode.AAX_IND_X,  () => AAX(IndirectX())    },
 				{ OpCode.CMP_IMD,    () => CMP(Immediate())    },
 				{ OpCode.CMP_ZERO,   () => CMP(ZeroPage())     },
 				{ OpCode.CMP_ZERO_X, () => CMP(ZeroPageX())    },
@@ -577,6 +585,8 @@ namespace DanTup.DaNES.Emulation
 
 		void AND(byte value) => Accumulator = SetZN((byte)(Accumulator & value));
 		void AND(ushort address) => AND(Ram.Read(address));
+
+		void AAX(ushort address) => Ram.Write(address, SetZN((byte)(Accumulator & XRegister)));
 
 		void CMP(byte value)
 		{
