@@ -62,6 +62,12 @@ namespace DanTup.DaNES.Emulation
 		byte PpuData;
 		byte OamDma;
 
+		const int SCANLINES_PER_FRAME = 262;
+		const int CYCLES_PER_SCANLINE = 341;
+
+		int scanline = -1;
+		int cycle = 0;
+
 		public Ppu(PpuMemoryMap ram, Bitmap screen)
 		{
 			Ram = ram;
@@ -79,6 +85,28 @@ namespace DanTup.DaNES.Emulation
 
 		public void Step()
 		{
+			// http://wiki.nesdev.com/w/index.php/PPU_rendering
+			if (scanline == -1)
+			{
+				// Pre-render scanline
+			}
+			else if (scanline < 240)
+			{
+				// Visible scanline
+			}
+			else
+			{
+				// Vertical blanking lines
+			}
+
+			cycle++;
+			if (cycle >= CYCLES_PER_SCANLINE)
+			{
+				cycle = 0;
+				scanline++;
+			}
+			if (scanline >= SCANLINES_PER_FRAME - 1)
+				scanline = -1;
 		}
 
 		public byte ReadRegister(ushort address)
