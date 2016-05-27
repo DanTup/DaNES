@@ -7,6 +7,38 @@ namespace DanTup.DaNES.Emulation
 		public Memory Ram { get; }
 		public Bitmap Screen { get; }
 
+		// PPU Control
+		bool NmiEnable;
+		bool PpuMasterSlave;
+		bool SpriteHeight;
+		bool BackgroundTileSelect;
+		bool SpriteTileSelect;
+		bool IncrementMode;
+		bool NameTableSelect1;
+		bool NameTableSelect0;
+
+		// PPU Mask
+		bool TintBlue;
+		bool TintGreen;
+		bool TintRed;
+		bool ShowSprites;
+		bool ShowBackground;
+		bool ShowLeftSprites;
+		bool ShowLeftBackground;
+		bool Greyscale;
+
+		// PPU Status
+		bool VBlank;
+		bool Sprite0Hit;
+		bool SpriteOverflow;
+
+		byte OamAddress { get; }
+		byte OamData { get; }
+		byte PpuScroll { get; }
+		byte PpuAddr { get; }
+		byte PpuData { get; }
+		byte OamDma { get; }
+
 		public Ppu(Memory ram, Bitmap screen)
 		{
 			Ram = ram;
