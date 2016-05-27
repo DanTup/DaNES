@@ -661,7 +661,7 @@ namespace DanTup.DaNES.Emulation
 		void SBC(byte value) => ADC((byte)(value ^ 0xFF)); // SBC is the same as ADC with bits inverted?
 		void SBC(ushort address) => SBC(Ram.Read(address));
 
-		void DCP(ushort address) => Ram.Write(address, (byte)(Ram.Read(address) - 1));
+		void DCP(ushort address) => SetZN((byte)(Accumulator - Ram.Write(address, (byte)(Ram.Read(address) - 1))));
 		void ISC(ushort address) => Accumulator -= SetZN(Ram.Write(address, (byte)(Ram.Read(address) + 1)));
 
 		byte Immediate() => ReadNext();
