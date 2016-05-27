@@ -253,6 +253,10 @@ namespace DanTup.DaNES.Emulation
 			// TODO: It's possible we can reduce this due to patterns in ops/address modes:
 			// http://nesdev.com/6502_cpu.txt
 
+			// The best explanation of opcodes seems to be here:
+			//   http://www.oxyron.de/html/opcodes02.html
+			// Many of the others are missing important details (Eg. DCP sets flags based on A - result).
+
 			opCodes = new Dictionary<OpCode, Action>
 			{
 				{ OpCode.NOP,              NOP                 },
