@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Threading;
 
 namespace DanTup.DaNES.Emulation
@@ -11,6 +12,7 @@ namespace DanTup.DaNES.Emulation
 		internal Cpu6502 Cpu { get; set; }
 		internal Memory PpuRam { get; set; }
 		internal Ppu Ppu { get; set; }
+		Bitmap Screen { get; } = new Bitmap(256, 240);
 
 		protected const ushort InitialProgramCounter = 0xC004; /* TOOD: This is correct for nestest (non-automated), but we need to read from reset vector */
 		protected const ushort InitialStackPointer = 0xFD;
@@ -20,28 +22,32 @@ namespace DanTup.DaNES.Emulation
 			CpuRam = new Memory(0x10000);
 			Cpu = new Cpu6502(CpuRam, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
 			PpuRam = new Memory(0x4000);
-			Ppu = new Ppu(PpuRam);
+			Ppu = new Ppu(PpuRam, Screen);
 
 			var ppuSpeed = 21.477272 / 4;
 			PpuCycleDuration = TimeSpan.FromMilliseconds(1.0f / ppuSpeed);
 		}
 
-		public void Run()
+		public void Run() => Run(null);
+
+		public void Run(Action<Bitmap> drawFrame)
 		{
-			int clock = 0;
+			int clock = -1;
 			int? cpuCyclesToBurn = 0;
 			while (true)
 			{
 				// CPU only steps on every third tick.
 				// And only if we don't have to burn some cycles.
-				if (clock++ % 3 == 0 && cpuCyclesToBurn-- <= 0)
+				clock = (clock + 1) % 3;
+				if (clock % 3 == 0 && cpuCyclesToBurn-- <= 0)
 					cpuCyclesToBurn = Cpu.Step();
 
 				// If we get null back, the program has ended/hit unknown opcode.
 				if (cpuCyclesToBurn == null)
 					return;
 
-				// Ppu.Step();
+				Ppu.Step();
+				drawFrame?.Invoke(Screen);
 
 				// Sleep until it's time for the next cycle.
 				var elapsed = DateTime.Now - lastTick;
