@@ -34,7 +34,7 @@ namespace DanTup.DaNES.Emulation
 		bool SpriteOverflow;
 
 		byte OamAddress;
-		byte OamData;
+		byte[] OamData = new byte[256];
 		byte PpuScroll;
 		byte PpuAddr;
 		byte PpuData;
@@ -92,7 +92,7 @@ namespace DanTup.DaNES.Emulation
 						(Sprite0Hit ? 0x40 : 0) |
 						(SpriteOverflow ? 0x20 : 0));
 				case 0x2003: return OamAddress;
-				case 0x2004: return OamData;
+				case 0x2004: return OamData[OamAddress];
 				case 0x2005: return PpuScroll;
 				case 0x2006: return PpuAddr;
 				case 0x2007: return PpuData;
@@ -137,7 +137,7 @@ namespace DanTup.DaNES.Emulation
 					OamAddress = value;
 					break;
 				case 0x2004:
-					OamData = value;
+					OamData[OamAddress] = value;
 					break;
 				case 0x2005:
 					PpuScroll = value;
