@@ -65,6 +65,8 @@ namespace DanTup.DaNES.Emulation
 			// https://en.wikibooks.org/wiki/NES_Programming/Memory_Map
 			switch (address)
 			{
+				// TODO: Figure out whether we're better storing this as byte and doing bitwise operations
+				// when changig them (if it's read/write as a byte more often, maybe worth switching).
 				case 0x2000:
 					return (byte)(
 					   (NmiEnable ? 0x80 : 0) |
