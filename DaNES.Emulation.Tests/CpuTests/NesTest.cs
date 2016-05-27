@@ -108,7 +108,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		{
 			public LoggingNes()
 			{
-				PpuRam = new Memory(0x4000);
+				PpuRam = new PpuMemoryMap();
 				Ppu = new Ppu(PpuRam, Screen);
 				Ram = new MemoryMap(Ppu);
 				Cpu = new LoggingCpu(Ram, programCounter: 0xC000, stackPointer: InitialStackPointer);

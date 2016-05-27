@@ -5,7 +5,7 @@ namespace DanTup.DaNES.Emulation
 {
 	class Ppu
 	{
-		public Memory Ram { get; }
+		public PpuMemoryMap Ram { get; }
 		public Bitmap Screen { get; }
 
 		// PPU Control
@@ -40,7 +40,7 @@ namespace DanTup.DaNES.Emulation
 		byte PpuData;
 		byte OamDma;
 
-		public Ppu(Memory ram, Bitmap screen)
+		public Ppu(PpuMemoryMap ram, Bitmap screen)
 		{
 			Ram = ram;
 			Screen = screen;

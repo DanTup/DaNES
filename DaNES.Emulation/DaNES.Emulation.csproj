@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Cpu.cs" />
     <Compile Include="Cpu6502.cs" />
+    <Compile Include="PpuMemoryMap.cs" />
     <Compile Include="MemoryMap.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="Nes.cs" />

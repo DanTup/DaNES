@@ -10,7 +10,7 @@ namespace DanTup.DaNES.Emulation
 		DateTime lastTick = DateTime.Now;
 		internal MemoryMap Ram { get; set; }
 		internal Cpu6502 Cpu { get; set; }
-		internal Memory PpuRam { get; set; }
+		internal PpuMemoryMap PpuRam { get; set; }
 		internal Ppu Ppu { get; set; }
 		internal Bitmap Screen { get; } = new Bitmap(256, 240);
 
@@ -19,11 +19,10 @@ namespace DanTup.DaNES.Emulation
 
 		public Nes()
 		{
-			PpuRam = new Memory(0x4000);
+			PpuRam = new PpuMemoryMap();
 			Ppu = new Ppu(PpuRam, Screen);
 			Ram = new MemoryMap(Ppu);
 			Cpu = new Cpu6502(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
-
 
 			var ppuSpeed = 21.477272 / 4;
 			PpuCycleDuration = TimeSpan.FromMilliseconds(1.0f / ppuSpeed);
