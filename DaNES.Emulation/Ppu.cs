@@ -59,9 +59,50 @@ namespace DanTup.DaNES.Emulation
 		{
 		}
 
+		public byte ReadRegister(ushort address)
+		{
+			// CPU addresses registers as 8 bytes from 0x2000 + 0x4014.
+			// https://en.wikibooks.org/wiki/NES_Programming/Memory_Map
+			switch (address)
+			{
+				case 0x2000:
+					return (byte)(
+					   (NmiEnable ? 0x80 : 0) |
+					   (PpuMasterSlave ? 0x40 : 0) |
+					   (SpriteHeight ? 0x20 : 0) |
+					   (BackgroundTileSelect ? 0x10 : 0) |
+					   (SpriteTileSelect ? 0x8 : 0) |
+					   (IncrementMode ? 0x4 : 0) |
+					   (NameTableSelect1 ? 0x2 : 0) |
+					   (NameTableSelect0 ? 0x1 : 0));
+				case 0x2001:
+					return (byte)((TintBlue ? 0x80 : 0) |
+					   (TintGreen ? 0x40 : 0) |
+					   (TintRed ? 0x20 : 0) |
+					   (ShowSprites ? 0x10 : 0) |
+					   (ShowBackground ? 0x8 : 0) |
+					   (ShowLeftSprites ? 0x4 : 0) |
+					   (ShowLeftBackground ? 0x2 : 0) |
+					   (Greyscale ? 0x1 : 0));
+				case 0x2002:
+					return (byte)(
+						(VBlank ? 0x80 : 0) |
+						(Sprite0Hit ? 0x40 : 0) |
+						(SpriteOverflow ? 0x20 : 0));
+				case 0x2003: return OamAddress;
+				case 0x2004: return OamData;
+				case 0x2005: return PpuScroll;
+				case 0x2006: return PpuAddr;
+				case 0x2007: return PpuData;
+				case 0x4014: return OamDma;
+				default:
+					throw new InvalidOperationException(string.Format("Invalid attempt to write to PPU address {0:X2}", address));
+			}
+		}
+
 		public void WriteRegister(ushort address, byte value)
 		{
-			// CPU addresses registers as 8 bytes from 0x2000.
+			// CPU addresses registers as 8 bytes from 0x2000 + 0x4014.
 			// https://en.wikibooks.org/wiki/NES_Programming/Memory_Map
 			switch (address)
 			{
