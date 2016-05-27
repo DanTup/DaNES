@@ -680,7 +680,7 @@ namespace DanTup.DaNES.Emulation
 		byte[] ToBytes(ushort value) => new[] { (byte)(value >> 8), (byte)value };
 		protected ushort FromBytes(byte b1, byte b2) => (ushort)(b1 | b2 << 8);
 
-		void Branch(bool condition) => BranchIf(condition, ReadNext());
-		void BranchIf(bool condition, ushort offset) => ProgramCounter += (ushort)(condition ? offset : 0);
+		void Branch(bool condition) => BranchIf(condition, (sbyte)ReadNext());
+		void BranchIf(bool condition, sbyte offset) => ProgramCounter += (ushort)(condition ? offset : 0);
 	}
 }
