@@ -109,7 +109,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			public LoggingNes()
 			{
 				Ram = new Memory(0x10000);
-				Cpu = new LoggingCpu(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
+				Cpu = new LoggingCpu(Ram, programCounter: 0xC000, stackPointer: InitialStackPointer);
 			}
 		}
 
@@ -117,6 +117,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 		{
 			public LoggingCpu(Memory ram, ushort programCounter, ushort stackPointer) : base(ram, programCounter, stackPointer)
 			{
+				CycleDuration = TimeSpan.Zero;
 			}
 
 			public StringBuilder Log = new StringBuilder();

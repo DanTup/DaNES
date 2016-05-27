@@ -5,7 +5,7 @@
 		internal Cpu6502 Cpu { get; set; }
 		internal Memory Ram { get; set; }
 
-		protected const ushort InitialProgramCounter = 0xC000;
+		protected const ushort InitialProgramCounter = 0xC004; /* TOOD: This is correct for nestest (non-automated), but we need to read from reset vector */
 		protected const ushort InitialStackPointer = 0xFD;
 
 		public Nes()
@@ -14,12 +14,12 @@
 			Cpu = new Cpu6502(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
 		}
 
-		internal void Run() => Cpu.Run();
+		public void Run() => Cpu.Run();
 
 		/// <summary>
 		/// Loads a program for the CPU to execute.
 		/// </summary>
-		internal void LoadProgram(params byte[] program)
+		public void LoadProgram(params byte[] program)
 		{
 			// TODO: Should we duplicate this, or just re-point requests?
 			Ram.Write(0x8000, program);

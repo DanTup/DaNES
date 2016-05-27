@@ -5,7 +5,7 @@ namespace DanTup.DaNES.Emulation
 	class Cpu
 	{
 		protected long TotalCycles { get; set; }
-		protected TimeSpan CycleDuration { get; }
+		protected TimeSpan CycleDuration { get; set; }
 
 		public ushort ProgramCounter { get; protected set; }
 		public ushort StackPointer { get; protected set; }
@@ -15,8 +15,9 @@ namespace DanTup.DaNES.Emulation
 		{
 			Ram = ram;
 
-			// TODO: Allow passing in a speed (or "Fastest").
-			CycleDuration = TimeSpan.Zero;
+			// TODO: What is this?
+			var cpuSpeed = 21.477272 / 12;
+			CycleDuration = TimeSpan.FromMilliseconds(1.0f / cpuSpeed);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading;
 
 namespace DanTup.DaNES.Emulation
@@ -469,6 +470,7 @@ namespace DanTup.DaNES.Emulation
 			{
 				DateTime startTime = DateTime.Now;
 
+				Debug.WriteLine(string.Format("PC: {0}", ProgramCounter.ToString("X4")));
 				if (!ProcessNextOpCode())
 					break;
 
