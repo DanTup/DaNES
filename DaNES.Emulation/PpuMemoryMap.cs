@@ -4,7 +4,7 @@
 	{
 		Memory tables = new Memory(0x3000);
 		Memory palettes = new Memory(0x20);
-		
+
 		public byte Read(ushort address)
 		{
 			if (address < 0x3000)

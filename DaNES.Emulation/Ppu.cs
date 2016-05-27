@@ -5,6 +5,28 @@ namespace DanTup.DaNES.Emulation
 {
 	class Ppu
 	{
+		struct Pair
+		{
+			public byte Hi;
+			public byte Lo;
+			public bool NextIsHigh;
+
+			public byte Read()
+			{
+				NextIsHigh = !NextIsHigh;
+				return NextIsHigh ? Lo : Hi; // Inverted because we already swapped.
+			}
+
+			public void Write(byte value)
+			{
+				if (NextIsHigh)
+					Hi = value;
+				else
+					Lo = value;
+				NextIsHigh = !NextIsHigh;
+			}
+		}
+
 		public PpuMemoryMap Ram { get; }
 		public Bitmap Screen { get; }
 
@@ -35,8 +57,8 @@ namespace DanTup.DaNES.Emulation
 
 		byte OamAddress;
 		byte[] OamData = new byte[256];
-		byte PpuScroll;
-		byte PpuAddr;
+		Pair PpuScroll;
+		Pair PpuAddr;
 		byte PpuData;
 		byte OamDma;
 
@@ -87,15 +109,22 @@ namespace DanTup.DaNES.Emulation
 					   (ShowLeftBackground ? 0x2 : 0) |
 					   (Greyscale ? 0x1 : 0));
 				case 0x2002:
+					PpuScroll.NextIsHigh = true;
+					PpuAddr.NextIsHigh = true;
 					return (byte)(
 						(VBlank ? 0x80 : 0) |
 						(Sprite0Hit ? 0x40 : 0) |
 						(SpriteOverflow ? 0x20 : 0));
 				case 0x2003: return OamAddress;
 				case 0x2004: return OamData[OamAddress];
-				case 0x2005: return PpuScroll;
-				case 0x2006: return PpuAddr;
-				case 0x2007: return PpuData;
+				case 0x2005: throw new InvalidOperationException("PpuScroll is write-only");
+				case 0x2006: throw new InvalidOperationException("PpuAddr is write-only");
+				case 0x2007:
+					// For reads < 0x3F00 we buffer the value, else we return it as-is.
+					var addr = (ushort)(PpuAddr.Hi << 8 | PpuAddr.Lo);
+					var value = addr < 0x3F00 ? PpuData : Ram.Read(addr);
+					PpuData = Ram.Read(addr);
+					return value;
 				case 0x4014: return OamDma;
 				default:
 					throw new InvalidOperationException(string.Format("Invalid attempt to write to PPU address {0:X2}", address));
@@ -128,11 +157,7 @@ namespace DanTup.DaNES.Emulation
 					ShowLeftBackground = (value & 0x2) != 0;
 					Greyscale = (value & 0x1) != 0;
 					break;
-				case 0x2002:
-					VBlank = (value & 0x80) != 0;
-					Sprite0Hit = (value & 0x40) != 0;
-					SpriteOverflow = (value & 0x20) != 0;
-					break;
+				case 0x2002: throw new InvalidOperationException("PpuStatus is read-only");
 				case 0x2003:
 					OamAddress = value;
 					break;
@@ -140,10 +165,10 @@ namespace DanTup.DaNES.Emulation
 					OamData[OamAddress] = value;
 					break;
 				case 0x2005:
-					PpuScroll = value;
+					PpuScroll.Write(value);
 					break;
 				case 0x2006:
-					PpuAddr = value;
+					PpuAddr.Write(value);
 					break;
 				case 0x2007:
 					PpuData = value;
