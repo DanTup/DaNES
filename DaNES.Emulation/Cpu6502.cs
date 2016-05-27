@@ -586,7 +586,7 @@ namespace DanTup.DaNES.Emulation
 		void AND(byte value) => Accumulator = SetZN((byte)(Accumulator & value));
 		void AND(ushort address) => AND(Ram.Read(address));
 
-		void AAX(ushort address) => Ram.Write(address, SetZN((byte)(Accumulator & XRegister)));
+		void AAX(ushort address) => Ram.Write(address, (byte)(Accumulator & XRegister));
 
 		void CMP(byte value)
 		{
