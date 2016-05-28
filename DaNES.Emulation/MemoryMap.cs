@@ -43,7 +43,7 @@ namespace DanTup.DaNES.Emulation
 			else if (address < 0x4000)
 				return ppu.ReadRegister((ushort)(0x2000 + ((address - 0x2000) % 8)));
 			else if (address < 0x4020)
-				return registers.Read((ushort)(address - 0x4020));
+				return registers.Read((ushort)(address - 0x4000));
 			else if (address < 0x8000)
 				return sram.Read((ushort)(address - 0x4020));
 			else if (address < 0xC000)
@@ -59,7 +59,7 @@ namespace DanTup.DaNES.Emulation
 			else if (address < 0x4000)
 				return ppu.WriteRegister((ushort)(0x2000 + ((address - 0x2000) % 8)), value);
 			else if (address < 0x4020)
-				return registers.Write((ushort)(address - 0x4020), value);
+				return registers.Write((ushort)(address - 0x4000), value);
 			else if (address < 0x8000)
 				return sram.Write((ushort)(address - 0x4020), value);
 			else if (address < 0xC000)
