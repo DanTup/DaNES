@@ -516,7 +516,9 @@ namespace DanTup.DaNES.Emulation
 		{
 			var value = Ram.Read(address);
 			Carry = ((value >> 7) & 1) != 0;
-			SetZN(Accumulator |= (byte)(value << 1));
+			var newValue = (byte)(value << 1);
+			Ram.Write(address, newValue);
+			SetZN(Accumulator |= newValue);
 		}
 
 		void STA(ushort address) => Ram.Write(address, Accumulator);
