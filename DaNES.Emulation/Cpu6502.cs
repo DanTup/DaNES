@@ -96,6 +96,13 @@ namespace DanTup.DaNES.Emulation
 			SLO_ABS_Y = 0x1B,
 			SLO_IND_X = 0x03,
 			SLO_IND_Y = 0x13,
+			SRE_ZERO = 0x47,
+			SRE_ZERO_X = 0x57,
+			SRE_ABS = 0x4F,
+			SRE_ABS_X = 0x5F,
+			SRE_ABS_Y = 0x5B,
+			SRE_IND_X = 0x43,
+			SRE_IND_Y = 0x53,
 			JMP_ABS = 0x4C,
 			JMP_IND = 0x6C,
 			JSR = 0x20,
@@ -324,6 +331,13 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.SLO_ABS_Y,  () => SLO(AbsoluteY())    },
 				{ OpCode.SLO_IND_X,  () => SLO(IndirectX())    },
 				{ OpCode.SLO_IND_Y,  () => SLO(IndirectY())    },
+				{ OpCode.SRE_ZERO,   () => SRE(ZeroPage())     },
+				{ OpCode.SRE_ZERO_X, () => SRE(ZeroPageX())    },
+				{ OpCode.SRE_ABS,    () => SRE(Absolute())     },
+				{ OpCode.SRE_ABS_X,  () => SRE(AbsoluteX())    },
+				{ OpCode.SRE_ABS_Y,  () => SRE(AbsoluteY())    },
+				{ OpCode.SRE_IND_X,  () => SRE(IndirectX())    },
+				{ OpCode.SRE_IND_Y,  () => SRE(IndirectY())    },
 				{ OpCode.STX_IMD,    () => STX(ImmediateW())   },
 				{ OpCode.STX_ZERO_Y, () => STX(ZeroPageY())    },
 				{ OpCode.STX_ABS,    () => STX(Absolute())     },
@@ -533,6 +547,14 @@ namespace DanTup.DaNES.Emulation
 			var newValue = (byte)(value << 1);
 			Ram.Write(address, newValue);
 			SetZN(Accumulator |= newValue);
+		}
+		void SRE(ushort address)
+		{
+			var value = Ram.Read(address);
+			Carry = (value & 1) != 0;
+			var newValue = (byte)(value >> 1);
+			Ram.Write(address, newValue);
+			SetZN(Accumulator ^= newValue);
 		}
 
 		void STA(ushort address) => Ram.Write(address, Accumulator);
