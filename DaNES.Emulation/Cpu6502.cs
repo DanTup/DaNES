@@ -575,11 +575,11 @@ namespace DanTup.DaNES.Emulation
 			var value = Ram.Read(address);
 			var old_carry = Carry;
 			var newValue = (byte)((byte)(value >> 1) | (byte)(old_carry ? 128 : 0));
-			var newAccumulator = (byte)(Accumulator + newValue + (value & 1));
-			Carry = (newAccumulator & 1) != 0;
+			var newAccumulator = (Accumulator + newValue + (value & 1));
+			Carry = (newAccumulator & 0xFF00) != 0;
 			Overflow = ((Accumulator ^ value) & (Accumulator ^ newAccumulator) & 128) != 0;
 			Ram.Write(address, newValue);
-			SetZN(Accumulator = newAccumulator);			
+			SetZN(Accumulator = (byte)newAccumulator);
 		}
 
 		void STA(ushort address) => Ram.Write(address, Accumulator);
