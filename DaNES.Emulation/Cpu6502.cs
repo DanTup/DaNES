@@ -103,6 +103,13 @@ namespace DanTup.DaNES.Emulation
 			SRE_ABS_Y = 0x5B,
 			SRE_IND_X = 0x43,
 			SRE_IND_Y = 0x53,
+			RRA_ZERO = 0x67,
+			RRA_ZERO_X = 0x77,
+			RRA_ABS = 0x6F,
+			RRA_ABS_X = 0x7F,
+			RRA_ABS_Y = 0x7B,
+			RRA_IND_X = 0x63,
+			RRA_IND_Y = 0x73,
 			JMP_ABS = 0x4C,
 			JMP_IND = 0x6C,
 			JSR = 0x20,
@@ -338,6 +345,13 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.SRE_ABS_Y,  () => SRE(AbsoluteY())    },
 				{ OpCode.SRE_IND_X,  () => SRE(IndirectX())    },
 				{ OpCode.SRE_IND_Y,  () => SRE(IndirectY())    },
+				{ OpCode.RRA_ZERO,   () => RRA(ZeroPage())     },
+				{ OpCode.RRA_ZERO_X, () => RRA(ZeroPageX())    },
+				{ OpCode.RRA_ABS,    () => RRA(Absolute())     },
+				{ OpCode.RRA_ABS_X,  () => RRA(AbsoluteX())    },
+				{ OpCode.RRA_ABS_Y,  () => RRA(AbsoluteY())    },
+				{ OpCode.RRA_IND_X,  () => RRA(IndirectX())    },
+				{ OpCode.RRA_IND_Y,  () => RRA(IndirectY())    },
 				{ OpCode.STX_IMD,    () => STX(ImmediateW())   },
 				{ OpCode.STX_ZERO_Y, () => STX(ZeroPageY())    },
 				{ OpCode.STX_ABS,    () => STX(Absolute())     },
@@ -556,6 +570,17 @@ namespace DanTup.DaNES.Emulation
 			Ram.Write(address, newValue);
 			SetZN(Accumulator ^= newValue);
 		}
+		void RRA(ushort address)
+		{
+			var value = Ram.Read(address);
+			var old_carry = Carry;
+			var newValue = (byte)((byte)(value >> 1) | (byte)(old_carry ? 128 : 0));
+			var newAccumulator = (byte)(Accumulator + newValue + (value & 1));
+			Carry = (newAccumulator & 1) != 0;
+			Overflow = ((Accumulator ^ value) & (Accumulator ^ newAccumulator) & 128) != 0;
+			Ram.Write(address, newValue);
+			SetZN(Accumulator = newAccumulator);			
+		}
 
 		void STA(ushort address) => Ram.Write(address, Accumulator);
 		void STX(ushort address) => Ram.Write(address, XRegister);
@@ -646,7 +671,7 @@ namespace DanTup.DaNES.Emulation
 			var value = Ram.Read(address);
 			var old_carry = Carry;
 			Carry = (value & 128) != 0;
-			var newValue = (byte)((value << 1) | (byte)(old_carry ? 1 : 0));			
+			var newValue = (byte)((value << 1) | (byte)(old_carry ? 1 : 0));
 			Ram.Write(address, newValue);
 			SetZN(Accumulator &= newValue);
 		}
