@@ -24,6 +24,5 @@ namespace DanTup.DaNES
 		}
 
 		void UpdateScreen(Bitmap screen) => pbScreen.Image = screen;
-
 	}
 }
