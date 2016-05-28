@@ -146,6 +146,10 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 
 			internal override bool ProcessNextOpCode()
 			{
+				// nestest drops us back at 1 when it's done?
+				if (ProgramCounter == 1)
+					return false;
+
 				logInfo = new LogInfo();
 				logInfo.ProgramCounter = ProgramCounter;
 				logInfo.Registers = string.Format("A:{0:X2} X:{1:X2} Y:{2:X2} P:{3:X2} SP:{4:X2} CYC:{5:X2} SL:{6}", Accumulator, XRegister, YRegister, GetStatus(), StackPointer, "0".PadLeft(3), "0".PadRight(3));
