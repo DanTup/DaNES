@@ -225,6 +225,13 @@ namespace DanTup.DaNES.Emulation
 			ROL_ZERO_X = 0x36,
 			ROL_ABS = 0x2E,
 			ROL_ABS_X = 0x3E,
+			RLA_ZERO = 0x27,
+			RLA_ZERO_X = 0x37,
+			RLA_ABS = 0x2F,
+			RLA_ABS_X = 0x3F,
+			RLA_ABS_Y = 0x3B,
+			RLA_IND_X = 0x23,
+			RLA_IND_Y = 0x33,
 			INC_ZERO = 0xE6,
 			INC_ZERO_X = 0xF6,
 			INC_ABS = 0xEE,
@@ -459,6 +466,13 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.ROL_ZERO_X, () => ROL(ZeroPageX())    },
 				{ OpCode.ROL_ABS,    () => ROL(Absolute())     },
 				{ OpCode.ROL_ABS_X,  () => ROL(AbsoluteX())    },
+				{ OpCode.RLA_ZERO,   () => RLA(ZeroPage())     },
+				{ OpCode.RLA_ZERO_X, () => RLA(ZeroPageX())    },
+				{ OpCode.RLA_ABS,    () => RLA(Absolute())     },
+				{ OpCode.RLA_ABS_X,  () => RLA(AbsoluteX())    },
+				{ OpCode.RLA_ABS_Y,  () => RLA(AbsoluteY())    },
+				{ OpCode.RLA_IND_X,  () => RLA(IndirectX())    },
+				{ OpCode.RLA_IND_Y,  () => RLA(IndirectY())    },
 				{ OpCode.INC_ZERO,   () => INC(ZeroPage())     },
 				{ OpCode.INC_ZERO_X, () => INC(ZeroPageX())    },
 				{ OpCode.INC_ABS,    () => INC(Absolute())     },
@@ -515,7 +529,7 @@ namespace DanTup.DaNES.Emulation
 		void SLO(ushort address)
 		{
 			var value = Ram.Read(address);
-			Carry = ((value >> 7) & 1) != 0;
+			Carry = (value & 128) != 0;
 			var newValue = (byte)(value << 1);
 			Ram.Write(address, newValue);
 			SetZN(Accumulator |= newValue);
@@ -604,6 +618,15 @@ namespace DanTup.DaNES.Emulation
 		}
 		void ROL(ushort address) => Ram.Write(address, ROL(Ram.Read(address)));
 		void ROL_A() => Accumulator = ROL(Accumulator);
+
+		void RLA(ushort address)
+		{
+			var value = Ram.Read(address);
+			var old_carry = Carry;
+			Carry = (value & 128) != 0;
+			var newValue = (byte)((value << 1) | (byte)(Carry ? 0 : 1));
+			SetZN(Accumulator &= newValue);
+		}
 
 		void INC(ushort address) => Ram.Write(address, SetZN((byte)(Ram.Read(address) + 1)));
 		void DEC(ushort address) => Ram.Write(address, SetZN((byte)(Ram.Read(address) - 1)));
