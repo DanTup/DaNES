@@ -3345,7 +3345,7 @@ DBA3  8D 01 03  STA $0301 = 00                  A:AA X:07 Y:00 P:E5 SP:FB CYC:13
 DBA6  A9 60     LDA #$60                        A:AA X:07 Y:00 P:E5 SP:FB CYC:144 SL:63
 DBA8  8D 02 03  STA $0302 = 00                  A:60 X:07 Y:00 P:65 SP:FB CYC:150 SL:63
 DBAB  20 B5 DB  JSR $DBB5                       A:60 X:07 Y:00 P:65 SP:FB CYC:162 SL:63
-DBB5  6C FF 02  JMP ($02FF) = A900              A:60 X:07 Y:00 P:65 SP:F9 CYC:180 SL:63
+DBB5  6C FF 02  JMP ($02FF) = 0300              A:60 X:07 Y:00 P:65 SP:F9 CYC:180 SL:63
 0300  A9 AA     LDA #$AA                        A:60 X:07 Y:00 P:65 SP:F9 CYC:195 SL:63
 0302  60        RTS                             A:AA X:07 Y:00 P:E5 SP:F9 CYC:201 SL:63
 DBAE  C9 AA     CMP #$AA                        A:AA X:07 Y:00 P:E5 SP:FB CYC:219 SL:63
