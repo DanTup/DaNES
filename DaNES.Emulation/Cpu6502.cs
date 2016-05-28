@@ -625,6 +625,7 @@ namespace DanTup.DaNES.Emulation
 			var old_carry = Carry;
 			Carry = (value & 128) != 0;
 			var newValue = (byte)((value << 1) | (byte)(Carry ? 0 : 1));
+			Ram.Write(address, newValue);
 			SetZN(Accumulator &= newValue);
 		}
 
