@@ -512,7 +512,7 @@ namespace DanTup.DaNES.Emulation
 			}.ToImmutableDictionary();
 		}
 
-		public int? Step()
+		internal virtual int? Step()
 		{
 			var instr = ReadNext();
 			if (instr == 0)

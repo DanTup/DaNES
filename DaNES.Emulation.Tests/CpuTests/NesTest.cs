@@ -144,11 +144,11 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 				}
 			}
 
-			internal override bool ProcessNextOpCode()
+			internal override int? Step()
 			{
 				// nestest drops us back at 1 when it's done?
 				if (ProgramCounter == 1)
-					return false;
+					return null;
 
 				logInfo = new LogInfo();
 				logInfo.ProgramCounter = ProgramCounter;
@@ -156,7 +156,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 
 				try
 				{
-					return base.ProcessNextOpCode();
+					return base.Step();
 				}
 				finally
 				{
