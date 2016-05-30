@@ -6,7 +6,7 @@ namespace DanTup.DaNES.Emulation
 {
 	public class Nes
 	{
-		internal TimeSpan PpuCycleDuration { get; set; }
+		internal TimeSpan CpuCycleDuration { get; set; }
 		DateTime lastTick = DateTime.Now;
 		internal MemoryMap Ram { get; set; }
 		internal Cpu6502 Cpu { get; set; }
@@ -24,34 +24,32 @@ namespace DanTup.DaNES.Emulation
 			Ram = new MemoryMap(Ppu);
 			Cpu = new Cpu6502(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
 
-			var ppuSpeed = 21.477272 / 4;
-			PpuCycleDuration = TimeSpan.FromMilliseconds(1.0f / ppuSpeed);
+			var cpuSpeed = 21.477272 / 12;
+			CpuCycleDuration = TimeSpan.FromMilliseconds(1.0f / cpuSpeed);
 		}
 
 		public void Run() => Run(null);
 
 		public void Run(Action<Bitmap> drawFrame)
 		{
-			int clock = -1;
-			int? cpuCyclesToBurn = 0;
 			while (true)
 			{
-				// CPU only steps on every third tick.
-				// And only if we don't have to burn some cycles.
-				clock = (clock + 1) % 3;
-				if (clock % 3 == 0 && cpuCyclesToBurn-- <= 0)
-					cpuCyclesToBurn = Cpu.Step();
+				var cpuCyclesSpent = Cpu.Step();
 
 				// If we get null back, the program has ended/hit unknown opcode.
-				if (cpuCyclesToBurn == null)
+				if (cpuCyclesSpent == null)
 					return;
 
-				Ppu.Step();
+				// Step PPU 3x as many as CPU used.
+				for (var i = 0; i < 3 * cpuCyclesSpent.Value; i++)
+					Ppu.Step();
+
+				// TODO: Probably don't need to do this so often?
 				drawFrame?.Invoke(Screen);
 
 				// Sleep until it's time for the next cycle.
 				var elapsed = DateTime.Now - lastTick;
-				var timeToSleep = (int)(PpuCycleDuration - elapsed).TotalMilliseconds;
+				var timeToSleep = cpuCyclesSpent.Value *  (int)((CpuCycleDuration) - elapsed).TotalMilliseconds;
 				if (timeToSleep > 0)
 					Thread.Sleep(timeToSleep);
 				lastTick = DateTime.Now;
