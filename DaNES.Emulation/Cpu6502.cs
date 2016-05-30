@@ -512,20 +512,11 @@ namespace DanTup.DaNES.Emulation
 			}.ToImmutableDictionary();
 		}
 
-		int cyclesToSpend;
 		public int? Step()
-		{
-			if (!ProcessNextOpCode())
-				return null;
-
-			return cyclesToSpend;
-		}
-
-		internal virtual bool ProcessNextOpCode()
 		{
 			var instr = ReadNext();
 			if (instr == 0)
-				return false;
+				return null;
 
 			var opCode = (OpCode)instr;
 			if (!opCodes.ContainsKey(opCode))
@@ -534,9 +525,9 @@ namespace DanTup.DaNES.Emulation
 			opCodes[opCode]();
 
 			// TODO: Count costs...
-			cyclesToSpend = 0;
+			var cyclesSpent = 1;
 
-			return true;
+			return cyclesSpent;
 		}
 
 		void NOP() { }
