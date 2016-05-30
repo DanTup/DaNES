@@ -20,9 +20,19 @@ namespace DanTup.DaNES
 			var program = new ArraySegment<byte>(File.ReadAllBytes(RomFile), 0x0010, 0x4000).ToArray();
 			nes.LoadProgram(program);
 
-			Task.Run(() => nes.Run(s => Invoke((Action<Bitmap>)UpdateScreen, s.Clone() as Bitmap)));
+			Task.Run(() => nes.Run(UpdateScreen));
 		}
 
-		void UpdateScreen(Bitmap screen) => pbScreen.Image = screen;
+		void UpdateScreen(Bitmap img)
+		{
+			try
+			{
+				Invoke((Action)(() => pbScreen.Image = (Bitmap)img.Clone()));
+			}
+			catch {
+				// TODO: This happens when form gets closed/disposed (expected).
+				// However may also masked real errors here :(
+			}
+		}
 	}
 }
