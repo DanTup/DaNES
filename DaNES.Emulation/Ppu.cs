@@ -83,7 +83,7 @@ namespace DanTup.DaNES.Emulation
 			}
 		}
 
-		public void Step()
+		public bool Step()
 		{
 			// http://wiki.nesdev.com/w/index.php/PPU_rendering
 			if (scanline == SCANLINES_PER_FRAME)
@@ -110,7 +110,12 @@ namespace DanTup.DaNES.Emulation
 				scanline++;
 			}
 			if (scanline > SCANLINES_PER_FRAME)
+			{
 				scanline = 0;
+				return true; // Trigger render
+			}
+
+			return false;
 		}
 
 		public byte ReadRegister(ushort address)
