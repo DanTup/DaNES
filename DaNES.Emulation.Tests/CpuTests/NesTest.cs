@@ -112,7 +112,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 				Ppu = new Ppu(PpuRam, Screen);
 				Ram = new MemoryMap(Ppu);
 				Cpu = new LoggingCpu(Ram, programCounter: 0xC000, stackPointer: InitialStackPointer);
-				CpuCycleDuration = TimeSpan.Zero;
+				CpuCycleDurationMilliseconds = 0f;
 			}
 		}
 
