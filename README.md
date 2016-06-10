@@ -1,4 +1,4 @@
-# DaNES
+# DaNES [![Build status](https://ci.appveyor.com/api/projects/status/wkcb84p9a0lr7jla?svg=true)](https://ci.appveyor.com/project/DanTup/danes)
 
 [DanTup](https://github.com/DanTup/)'s attempt to make a NES emulator in C#.
 
