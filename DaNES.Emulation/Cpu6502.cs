@@ -4,8 +4,12 @@ using System.Collections.Immutable;
 
 namespace DanTup.DaNES.Emulation
 {
-	class Cpu6502 : Cpu
+	class Cpu6502
 	{
+		public ushort ProgramCounter { get; internal protected set; }
+		public ushort StackPointer { get; protected set; }
+		public MemoryMap Ram { get; }
+
 		// Registers.
 		public byte Accumulator { get; internal set; }
 		public byte XRegister { get; internal set; }
@@ -262,8 +266,8 @@ namespace DanTup.DaNES.Emulation
 		readonly ImmutableDictionary<OpCode, Action> opCodes;
 
 		public Cpu6502(MemoryMap ram, ushort programCounter, ushort stackPointer)
-			: base(ram)
 		{
+			this.Ram = ram;
 			this.ProgramCounter = programCounter;
 			this.StackPointer = stackPointer;
 
