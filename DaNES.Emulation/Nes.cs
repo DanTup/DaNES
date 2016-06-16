@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace DanTup.DaNES.Emulation
 {
-	public class Nes
+	public class Nes // TODO: Make disposable or remove Bitmap.
 	{
 		internal double CpuCycleDurationMilliseconds { get; set; }
 		internal MemoryMap Ram { get; set; }
