@@ -116,7 +116,7 @@ namespace DanTup.DaNES.Emulation.Tests.CpuTests
 			}
 		}
 
-		class LoggingCpu : Cpu6502
+		class LoggingCpu : Cpu
 		{
 			public LoggingCpu(MemoryMap ram, ushort programCounter, ushort stackPointer) : base(ram, programCounter, stackPointer)
 			{

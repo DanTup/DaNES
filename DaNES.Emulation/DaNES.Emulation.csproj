@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cpu6502.cs" />
+    <Compile Include="Cpu.cs" />
     <Compile Include="OpCode.cs" />
     <Compile Include="PpuMemoryMap.cs" />
     <Compile Include="MemoryMap.cs" />

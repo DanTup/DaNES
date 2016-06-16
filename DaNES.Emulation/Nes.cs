@@ -9,7 +9,7 @@ namespace DanTup.DaNES.Emulation
 	{
 		internal double CpuCycleDurationMilliseconds { get; set; }
 		internal MemoryMap Ram { get; set; }
-		internal Cpu6502 Cpu { get; set; }
+		internal Cpu Cpu { get; set; }
 		internal PpuMemoryMap PpuRam { get; set; }
 		internal Ppu Ppu { get; set; }
 		internal Bitmap Screen { get; } = new Bitmap(256, 240);
@@ -22,7 +22,7 @@ namespace DanTup.DaNES.Emulation
 			PpuRam = new PpuMemoryMap();
 			Ppu = new Ppu(PpuRam, Screen);
 			Ram = new MemoryMap(Ppu);
-			Cpu = new Cpu6502(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
+			Cpu = new Cpu(Ram, programCounter: InitialProgramCounter, stackPointer: InitialStackPointer);
 
 			var cpuSpeed = 21.477272 / 12;
 			CpuCycleDurationMilliseconds = 1.0f / cpuSpeed;

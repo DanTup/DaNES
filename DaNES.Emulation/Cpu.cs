@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace DanTup.DaNES.Emulation
 {
-	class Cpu6502
+	class Cpu
 	{
 		internal ushort ProgramCounter { get; set; }
 		internal ushort StackPointer { get; private set; }
@@ -29,7 +29,7 @@ namespace DanTup.DaNES.Emulation
 		/// </summary>
 		readonly ImmutableDictionary<byte, Action> opCodes;
 
-		public Cpu6502(MemoryMap ram, ushort programCounter, ushort stackPointer)
+		public Cpu(MemoryMap ram, ushort programCounter, ushort stackPointer)
 		{
 			this.Ram = ram;
 			this.ProgramCounter = programCounter;
