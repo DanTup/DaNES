@@ -16,7 +16,5 @@ namespace DanTup.DaNES.Emulation
 		public byte Write(ushort address, byte value) => memory[address] = value;
 
 		public void Write(ushort address, byte[] value) => Array.Copy(value, 0, memory, address, value.Length);
-
-		public byte[] Raw => memory;
 	}
 }
