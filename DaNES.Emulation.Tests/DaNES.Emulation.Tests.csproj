@@ -61,7 +61,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CpuTests\LdaTests.cs" />
     <Compile Include="CpuTests\NesTest.cs" />
   </ItemGroup>
   <ItemGroup>
