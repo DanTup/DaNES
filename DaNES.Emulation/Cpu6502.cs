@@ -120,10 +120,10 @@ namespace DanTup.DaNES.Emulation
 				{ OpCode.RRA_ABS_Y,  () => RRA(AbsoluteY())    },
 				{ OpCode.RRA_IND_X,  () => RRA(IndirectX())    },
 				{ OpCode.RRA_IND_Y,  () => RRA(IndirectY())    },
-				{ OpCode.STX_IMD,    () => STX(ImmediateW())   },
+				{ OpCode.STX_IMD,    () => STX(Immediate())    },
 				{ OpCode.STX_ZERO_Y, () => STX(ZeroPageY())    },
 				{ OpCode.STX_ABS,    () => STX(Absolute())     },
-				{ OpCode.STY_IMD,    () => STY(ImmediateW())   },
+				{ OpCode.STY_IMD,    () => STY(Immediate())    },
 				{ OpCode.STY_ZERO_X, () => STY(ZeroPageX())    },
 				{ OpCode.STY_ABS,    () => STY(Absolute())     },
 				{ OpCode.JMP_ABS,    () => JMP(Absolute())     },
@@ -511,7 +511,6 @@ namespace DanTup.DaNES.Emulation
 		}
 
 		byte Immediate() => ReadNext();
-		byte ImmediateW() => ReadNext();
 		ushort Absolute() => FromBytes(ReadNext(), ReadNext());
 		ushort AbsoluteX() => (ushort)(FromBytes(ReadNext(), ReadNext()) + XRegister);
 		ushort AbsoluteY() => (ushort)(FromBytes(ReadNext(), ReadNext()) + YRegister);
