@@ -6,264 +6,28 @@ namespace DanTup.DaNES.Emulation
 {
 	class Cpu6502
 	{
-		public ushort ProgramCounter { get; internal protected set; }
-		public ushort StackPointer { get; protected set; }
-		public MemoryMap Ram { get; }
+		internal ushort ProgramCounter { get; set; }
+		internal ushort StackPointer { get; private set; }
+		internal MemoryMap Ram { get; }
 
 		// Registers.
-		public byte Accumulator { get; internal set; }
-		public byte XRegister { get; internal set; }
-		public byte YRegister { get; internal set; }
+		internal byte Accumulator { get; private set; }
+		internal byte XRegister { get; private set; }
+		internal byte YRegister { get; private set; }
 
 		// Status register.
-		public bool Negative { get; internal set; }
-		public bool Overflow { get; internal set; }
-		public bool Interrupted { get; internal set; }
-		public bool DecimalMode { get; internal set; }
-		public bool InterruptsDisabled { get; internal set; } = true;
-		public bool ZeroResult { get; internal set; }
-		public bool Carry { get; internal set; }
-
-		/// <summary>
-		/// All known OpCodes as an Enum to assign meaningful names.
-		/// </summary>
-		internal enum OpCode
-		{
-			NOP = 0xEA,
-			NOP_1 = 0x1A,
-			NOP_2 = 0x3A,
-			NOP_3 = 0x5A,
-			NOP_4 = 0x7A,
-			NOP_5 = 0xDA,
-			NOP_6 = 0xFA,
-			SKB_1 = 0x80,
-			SKB_2 = 0x82,
-			SKB_3 = 0xC2,
-			SKB_4 = 0xE2,
-			SKB_5 = 0x04,
-			SKB_6 = 0x14,
-			SKB_7 = 0x34,
-			SKB_8 = 0x44,
-			SKB_9 = 0x54,
-			SKB_10 = 0x64,
-			SKB_11 = 0x74,
-			SKB_12 = 0xD4,
-			SKB_13 = 0xF4,
-			SKW_1 = 0x0C,
-			SKW_2 = 0x1C,
-			SKW_3 = 0x3C,
-			SKW_4 = 0x5C,
-			SKW_5 = 0x7C,
-			SKW_6 = 0xDC,
-			SKW_7 = 0xFC,
-			LDA_IMD = 0xA9,
-			LDA_ZERO = 0xA5,
-			LDA_ZERO_X = 0xB5,
-			LDA_ABS = 0xAD,
-			LDA_ABS_X = 0xBD,
-			LDA_ABS_Y = 0xB9,
-			LDA_IND_X = 0xA1,
-			LDA_IND_Y = 0xB1,
-			STA_ZERO = 0x85,
-			STA_ZERO_X = 0x95,
-			STA_ABS = 0x8D,
-			STA_ABS_X = 0x9D,
-			STA_ABS_Y = 0x99,
-			STA_IND_X = 0x81,
-			STA_IND_Y = 0x91,
-			LDX_IMD = 0xA2,
-			LDX_ZERO = 0xA6,
-			LDX_ZERO_Y = 0xB6,
-			LDX_ABS = 0xAE,
-			LDX_ABS_Y = 0xBE,
-			LDY_IMD = 0xA0,
-			LDY_ZERO = 0xA4,
-			LDY_ZERO_X = 0xB4,
-			LDY_ABS = 0xAC,
-			LDY_ABS_X = 0xBC,
-			STX_IMD = 0x86,
-			STX_ZERO_Y = 0x96,
-			STX_ABS = 0x8E,
-			STY_IMD = 0x84,
-			STY_ZERO_X = 0x94,
-			STY_ABS = 0x8C,
-			LAX_ZERO = 0xA7,
-			LAX_ZERO_Y = 0xB7,
-			LAX_ABS = 0xAF,
-			LAX_ABS_Y = 0xBF,
-			LAX_IND_X = 0xA3,
-			LAX_IND_Y = 0xB3,
-			SLO_ZERO = 0x07,
-			SLO_ZERO_X = 0x17,
-			SLO_ABS = 0x0F,
-			SLO_ABS_X = 0x1F,
-			SLO_ABS_Y = 0x1B,
-			SLO_IND_X = 0x03,
-			SLO_IND_Y = 0x13,
-			SRE_ZERO = 0x47,
-			SRE_ZERO_X = 0x57,
-			SRE_ABS = 0x4F,
-			SRE_ABS_X = 0x5F,
-			SRE_ABS_Y = 0x5B,
-			SRE_IND_X = 0x43,
-			SRE_IND_Y = 0x53,
-			RRA_ZERO = 0x67,
-			RRA_ZERO_X = 0x77,
-			RRA_ABS = 0x6F,
-			RRA_ABS_X = 0x7F,
-			RRA_ABS_Y = 0x7B,
-			RRA_IND_X = 0x63,
-			RRA_IND_Y = 0x73,
-			JMP_ABS = 0x4C,
-			JMP_IND = 0x6C,
-			JSR = 0x20,
-			RTS = 0x60,
-			RTI = 0x40,
-			CLC = 0x18,
-			SEC = 0x38,
-			CLI = 0x58,
-			SEI = 0x78,
-			CLV = 0xB8,
-			CLD = 0xD8,
-			SED = 0xF8,
-			BPL = 0x10,
-			BMI = 0x30,
-			BVC = 0x50,
-			BVS = 0x70,
-			BCC = 0x90,
-			BCS = 0xB0,
-			BNE = 0xD0,
-			BEQ = 0xF0,
-			BIT_ZERO = 0x24,
-			BIT_ABS = 0x2C,
-			TXS = 0x9A,
-			TSX = 0xBA,
-			PHA = 0x48,
-			PLA = 0x68,
-			PHP = 0x08,
-			PLP = 0x28,
-			TAX = 0xAA,
-			TXA = 0x8A,
-			DEX = 0xCA,
-			INX = 0xE8,
-			TAY = 0xA8,
-			TYA = 0x98,
-			DEY = 0x88,
-			INY = 0xC8,
-			AND_IMD = 0x29,
-			AND_ZERO = 0x25,
-			AND_ZERO_X = 0x35,
-			AND_ABS = 0x2D,
-			AND_ABS_X = 0x3D,
-			AND_ABS_Y = 0x39,
-			AND_IND_X = 0x21,
-			AND_IND_Y = 0x31,
-			AAX_ZERO = 0x87,
-			AAX_ZERO_Y = 0x97,
-			AAX_ABS = 0x8F,
-			AAX_IND_X = 0x83,
-			CMP_IMD = 0xC9,
-			CMP_ZERO = 0xC5,
-			CMP_ZERO_X = 0xD5,
-			CMP_ABS = 0xCD,
-			CMP_ABS_X = 0xDD,
-			CMP_ABS_Y = 0xD9,
-			CMP_IND_X = 0xC1,
-			CMP_IND_Y = 0xD1,
-			CPX_IMD = 0xE0,
-			CPX_ZERO = 0xE4,
-			CPX_ABS = 0xEC,
-			CPY_IMD = 0xC0,
-			CPY_ZERO = 0xC4,
-			CPY_ABS = 0xCC,
-			ORA_IMD = 0x09,
-			ORA_ZERO = 0x05,
-			ORA_ZERO_X = 0x15,
-			ORA_ABS = 0x0D,
-			ORA_ABS_X = 0x1D,
-			ORA_ABS_Y = 0x19,
-			ORA_IND_X = 0x01,
-			ORA_IND_Y = 0x11,
-			EOR_IMD = 0x49,
-			EOR_ZERO = 0x45,
-			EOR_ZERO_X = 0x55,
-			EOR_ABS = 0x4D,
-			EOR_ABS_X = 0x5D,
-			EOR_ABS_Y = 0x59,
-			EOR_IND_X = 0x41,
-			EOR_IND_Y = 0x51,
-			ADC_IMD = 0x69,
-			ADC_ZERO = 0x65,
-			ADC_ZERO_X = 0x75,
-			ADC_ABS = 0x6D,
-			ADC_ABS_X = 0x7D,
-			ADC_ABS_Y = 0x79,
-			ADC_IND_X = 0x61,
-			ADC_IND_Y = 0x71,
-			SBC_IMD = 0xE9,
-			SBC_ZERO = 0xE5,
-			SBC_ZERO_X = 0xF5,
-			SBC_ABS = 0xED,
-			SBC_ABS_X = 0xFD,
-			SBC_ABS_Y = 0xF9,
-			SBC_IND_X = 0xE1,
-			SBC_IND_Y = 0xF1,
-			SBC = 0xEB,
-			DCP_ZERO = 0xC7,
-			DCP_ZERO_X = 0xD7,
-			DCP_ABS = 0xCF,
-			DCP_ABS_X = 0xDF,
-			DCP_ABS_Y = 0xDB,
-			DCP_IND_X = 0xC3,
-			DCP_IND_Y = 0xD3,
-			ISC_ZERO = 0xE7,
-			ISC_ZERO_X = 0xF7,
-			ISC_ABS = 0xEF,
-			ISC_ABS_X = 0xFF,
-			ISC_ABS_Y = 0xFB,
-			ISC_IND_X = 0xE3,
-			ISC_IND_Y = 0xF3,
-			LSR_A = 0x4A,
-			LSR_ZERO = 0x46,
-			LSR_ZERO_X = 0x56,
-			LSR_ABS = 0x4E,
-			LSR_ABS_X = 0x5E,
-			ASL_A = 0x0A,
-			ASL_ZERO = 0x06,
-			ASL_ZERO_X = 0x16,
-			ASL_ABS = 0x0E,
-			ASL_ABS_X = 0x1E,
-			ROR_A = 0x6A,
-			ROR_ZERO = 0x66,
-			ROR_ZERO_X = 0x76,
-			ROR_ABS = 0x6E,
-			ROR_ABS_X = 0x7E,
-			ROL_A = 0x2A,
-			ROL_ZERO = 0x26,
-			ROL_ZERO_X = 0x36,
-			ROL_ABS = 0x2E,
-			ROL_ABS_X = 0x3E,
-			RLA_ZERO = 0x27,
-			RLA_ZERO_X = 0x37,
-			RLA_ABS = 0x2F,
-			RLA_ABS_X = 0x3F,
-			RLA_ABS_Y = 0x3B,
-			RLA_IND_X = 0x23,
-			RLA_IND_Y = 0x33,
-			INC_ZERO = 0xE6,
-			INC_ZERO_X = 0xF6,
-			INC_ABS = 0xEE,
-			INC_ABS_X = 0xFE,
-			DEC_ZERO = 0xC6,
-			DEC_ZERO_X = 0xD6,
-			DEC_ABS = 0xCE,
-			DEC_ABS_X = 0xDE,
-		}
+		internal bool Negative { get; private set; }
+		internal bool Overflow { get; private set; }
+		internal bool Interrupted { get; private set; }
+		internal bool DecimalMode { get; private set; }
+		internal bool InterruptsDisabled { get; private set; } = true;
+		internal bool ZeroResult { get; private set; }
+		internal bool Carry { get; private set; }
 
 		/// <summary>
 		/// A lookup of OpCodes and their functions.
 		/// </summary>
-		readonly ImmutableDictionary<OpCode, Action> opCodes;
+		readonly ImmutableDictionary<byte, Action> opCodes;
 
 		public Cpu6502(MemoryMap ram, ushort programCounter, ushort stackPointer)
 		{
@@ -282,7 +46,7 @@ namespace DanTup.DaNES.Emulation
 			//   http://www.oxyron.de/html/opcodes02.html
 			// Many of the others are missing important details (Eg. DCP sets flags based on A - result).
 
-			opCodes = new Dictionary<OpCode, Action>
+			opCodes = new Dictionary<byte, Action>
 			{
 				{ OpCode.NOP,              NOP                 },
 				{ OpCode.NOP_1,            NOP                 },
@@ -518,13 +282,12 @@ namespace DanTup.DaNES.Emulation
 
 		internal virtual int? Step()
 		{
-			var instr = ReadNext();
-			if (instr == 0)
+			var opCode = ReadNext();
+			if (opCode == 0)
 				return null;
 
-			var opCode = (OpCode)instr;
 			if (!opCodes.ContainsKey(opCode))
-				throw new InvalidOperationException(string.Format("Unknown opcode: 0x{0}", instr.ToString("X2")));
+				throw new InvalidOperationException(string.Format("Unknown opcode: 0x{0}", opCode.ToString("X2")));
 
 			opCodes[opCode]();
 

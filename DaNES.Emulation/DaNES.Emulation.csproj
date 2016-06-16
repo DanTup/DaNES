@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cpu6502.cs" />
+    <Compile Include="OpCode.cs" />
     <Compile Include="PpuMemoryMap.cs" />
     <Compile Include="MemoryMap.cs" />
     <Compile Include="Memory.cs" />
